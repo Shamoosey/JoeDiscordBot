@@ -2,7 +2,7 @@ import { Client, Message} from "discord.js";
 import {inject, injectable} from "inversify";
 import { Commands} from "./enums"
 import { CronJob } from 'cron';
-import * as statuses from "./data/status.json"
+import jsonHelper from "./data/jsonHelper.json"
 import { Smokebot } from "./interfaces";
 import { Logger } from "winston";
 
@@ -41,7 +41,7 @@ export class Bot implements Smokebot.Bot{
 
         new CronJob('30 * * * *', async () => {
             try {
-                await this._helper.SetStatus(statuses.status[this._helper.GetRandomNumber(0, statuses.status.length - 1)])
+                await this._helper.SetStatus(jsonHelper.status[this._helper.GetRandomNumber(0, jsonHelper.status.length - 1)])
             } catch (e) {
                 this._logger.error("Error occured while setting the status", e)
             }
@@ -60,7 +60,7 @@ export class Bot implements Smokebot.Bot{
     private async onMessage(message:Message): Promise<void>{
         if(message.content.startsWith(process.env.PREFIX) && !message.author.bot){
             this._logger.info(`Incomming message "${message.content}" from ${message.author.username}`)
-            let returnMessage: string = `AY JACK! YOU AIN'T MAKING ANY SENSE, GET SOME ${process.env.PREFIX}help`
+            let returnMessage = jsonHelper.helpMessages[this._helper.GetRandomNumber(0, jsonHelper.helpMessages.length - 1)].replace("${help}", `${process.env.PREFIX}help`)
             let formattedMessage:string = message.content.substring(1);
             let command = formattedMessage.split(" ")[0].toLowerCase();
             let messageArgs = formattedMessage.substring(command.length + 1)
@@ -81,11 +81,15 @@ export class Bot implements Smokebot.Bot{
             }
             
             await message.channel.send(returnMessage)
-        } else if (message.content.toLowerCase().split(" ").find(x => x == "jack") && !message.author.bot) {
+        } else if (message.content.toLowerCase().indexOf("jack") >= 0 && !message.author.bot) {
             await message.channel.send("LISTEN HERE JACK!")
             await message.channel.send("https://cdn.discordapp.com/attachments/291815726426357760/945135820506038292/Z.png")
-        } else if (message.content.toLowerCase().split(" ").find(x => x == "corn pop") && !message.author.bot){
+        } else if (message.content.toLowerCase().indexOf("corn pop") >= 0 && !message.author.bot){
+            await message.channel.send("HE WAS A BAD DUDE!")
             await message.channel.send("https://cdn.discordapp.com/attachments/291815726426357760/945136211167703101/skynews-joe-biden-president_5645676.png")
+        } else if (message.content.toLowerCase().indexOf("joe biden") >= 0 && !message.author.bot){
+            await message.channel.send("I'm Joe Biden and I approve this message.");
+            await message.channel.send("https://cdn.discordapp.com/attachments/942229872644870155/945402165365723146/Eyi1SNTXEAUvdWi.jpg");
         }
     }
 }
