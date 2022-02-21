@@ -47,7 +47,7 @@ export class Bot implements Smokebot.Bot{
             }
         }, undefined, true, "America/Winnipeg", undefined, true);
 
-        new CronJob('0 1 * * *', async () => {
+        new CronJob('0 0 */1 * * *', async () => {
             try{
                 await this._helper.FilterNonValidUsers();
             } catch (e){
