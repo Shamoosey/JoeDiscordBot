@@ -47,7 +47,7 @@ export class Bot implements Smokebot.Bot{
             }
         }, undefined, true, "America/Winnipeg", undefined, true);
 
-        new CronJob('*/1 * * * *', async () => {
+        new CronJob('0 1 * * *', async () => {
             try{
                 await this._helper.FilterNonValidUsers();
             } catch (e){
@@ -79,6 +79,11 @@ export class Bot implements Smokebot.Bot{
             }
             
             await message.channel.send(returnMessage)
+        } else if (message.content.toLowerCase().split(" ").find(x => x == "jack") && !message.author.bot) {
+            await message.channel.send("LISTEN HERE JACK!")
+            await message.channel.send("https://cdn.discordapp.com/attachments/291815726426357760/945135820506038292/Z.png")
+        } else if (message.content.toLowerCase().split(" ").find(x => x == "cornpop") && !message.author.bot){
+            await message.channel.send("https://cdn.discordapp.com/attachments/291815726426357760/945136211167703101/skynews-joe-biden-president_5645676.png")
         }
     }
 }

@@ -8,29 +8,26 @@ import { Logger } from "winston";
 @injectable()
 export class Helper implements Smokebot.IHelper {
     private _client: Client;
-    private readonly _token: string;
     private _logger: Logger;
 
     private kickerCacheEnabled = true;
-    private readonly guild = "754070498425438300"
-    private readonly defaultChannel = "754070499042001058";
+    private readonly guild = "306275893167521792"
+    private readonly defaultChannel = "306275893167521792";
     private noRoleMembers: Map<string, Date> = new Map<string, Date>();
 
     constructor(
         @inject("Client") client: Client,
-        @inject("Token") token: string,
         @inject("Logger") logger: Logger,
     ) {
         this._client = client;
-        this._token = token;
         this._logger = logger;
     }
-    
+
     public async SetStatus(message:string):Promise<string> {
         await this._client.user.setActivity(message, {type: ActivityTypes.PLAYING})
         return `Status changed to: ${message}`;
     }
-    
+
     public GetHelpMessage(): string {
         let returnMessage: string =`Available Commands:`;
         let commands: string[] = Object.values(Commands);
@@ -72,7 +69,7 @@ export class Helper implements Smokebot.IHelper {
 
         if(this.kickerCacheEnabled){
             const dayThreshold = 2;
-            const hoursThreshold = 1;
+            const hoursThreshold = 3;
             let guild = this._client.guilds.cache.find(x => {return x.id== this.guild})
             if(guild){
                 for (let member of guild.members.cache.values()) {
@@ -80,9 +77,8 @@ export class Helper implements Smokebot.IHelper {
                     if(existingCachedMember){
                         let cachedTime = new Date(this.noRoleMembers.get(member.id));
                         let threasholdDate = new Date(member.joinedAt)
-                        cachedTime.setMinutes(cachedTime.getMinutes() + hoursThreshold)
-                        // cachedTime.setHours(cachedTime.getHours() + hoursThreshold)
-                        // threasholdDate.setDate(threasholdDate.getDate() + dayThreshold)
+                        cachedTime.setHours(cachedTime.getHours() + hoursThreshold)
+                        threasholdDate.setDate(threasholdDate.getDate() + dayThreshold)
 
                         if(cachedTime < new Date() && threasholdDate < new Date()){
                             let memberDm = await member.createDM();

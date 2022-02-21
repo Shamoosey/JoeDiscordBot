@@ -1,5 +1,3 @@
-import { GuildMember } from "discord.js";
-
 export namespace Smokebot{
 
     export interface Bot {
