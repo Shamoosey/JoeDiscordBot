@@ -16,7 +16,7 @@ export abstract class LogFactory {
 
     private static httpTransport = new Http({
         host: "192.168.0.123",
-        port: 12200 ,
+        port: 12202 ,
         path: "/gelf",
         format: LogFactory.getLogformat()
     })

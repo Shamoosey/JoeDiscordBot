@@ -111,9 +111,9 @@ export class Helper implements Smokebot.IHelper {
             for(let role of memberRoles){
                 if(role.name == "@everyone" && memberRoles.length == 1 && !existingCachedMember){
                     this.noRoleMembers.set(member.user.id, new Date)
-                    this._logger.info(`${member.user.username} does not have an assigned role, adding to cache`, member);
+                    this._logger.info(`${member.user.username} does not have an assigned role, adding to cache`);
                 } else if(role.name != "@everyone" && existingCachedMember) {
-                    this._logger.info(`${member.user.username} is assigned a role, removing user from cache`, member);
+                    this._logger.info(`${member.user.username} is assigned a role, removing user from cache`);
                     let index = this.noRoleMembers.delete(member.id)
                 }
             }
