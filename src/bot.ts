@@ -74,7 +74,9 @@ export class Bot implements Smokebot.Bot{
                     break;
                 case Commands.WeedBad:
                     returnMessage = "https://cdn.discordapp.com/attachments/330851322536394752/804162447861612604/vtf0hhkas9111.png";
-                    message.delete();
+                    if(message.guild !== null){
+                        message.delete();
+                    }
                     break;
             }
             
