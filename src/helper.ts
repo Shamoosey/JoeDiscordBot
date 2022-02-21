@@ -24,6 +24,7 @@ export class Helper implements Smokebot.IHelper {
     }
 
     public async SetStatus(message:string):Promise<string> {
+        this._logger.info(`Changing status to "${message}"`)
         await this._client.user.setActivity(message, {type: ActivityTypes.PLAYING})
         return `Status changed to: ${message}`;
     }

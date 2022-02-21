@@ -60,7 +60,7 @@ export class Bot implements Smokebot.Bot{
     private async onMessage(message:Message): Promise<void>{
         if(message.content.startsWith(process.env.PREFIX) && !message.author.bot){
             this._logger.info(`Incomming message "${message.content}" from ${message.author.username}`)
-            let returnMessage: string = `Unknown command, use ${process.env.PREFIX}help`
+            let returnMessage: string = `AY JACK! YOU AIN'T MAKING ANY SENSE, GET SOME ${process.env.PREFIX}help`
             let formattedMessage:string = message.content.substring(1);
             let command = formattedMessage.split(" ")[0].toLowerCase();
             let messageArgs = formattedMessage.substring(command.length + 1)
@@ -84,7 +84,7 @@ export class Bot implements Smokebot.Bot{
         } else if (message.content.toLowerCase().split(" ").find(x => x == "jack") && !message.author.bot) {
             await message.channel.send("LISTEN HERE JACK!")
             await message.channel.send("https://cdn.discordapp.com/attachments/291815726426357760/945135820506038292/Z.png")
-        } else if (message.content.toLowerCase().split(" ").find(x => x == "cornpop") && !message.author.bot){
+        } else if (message.content.toLowerCase().split(" ").find(x => x == "corn pop") && !message.author.bot){
             await message.channel.send("https://cdn.discordapp.com/attachments/291815726426357760/945136211167703101/skynews-joe-biden-president_5645676.png")
         }
     }
