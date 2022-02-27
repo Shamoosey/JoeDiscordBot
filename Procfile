@@ -1,1 +1,1 @@
-worker: npm run serve
+worker: tsc && node ./build/index.js
