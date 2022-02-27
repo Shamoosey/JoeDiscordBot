@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "serve": "tsc && node ./build/index.js",
+    "start": "tsc && node ./build/index.js",
     "build": "tsc"
   },
   "author": "Shamus Osler",
