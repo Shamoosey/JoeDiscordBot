@@ -90,6 +90,10 @@ export class Bot implements Smokebot.Bot{
         } else if (message.content.toLowerCase().indexOf("joe biden") >= 0 && !message.author.bot){
             await message.channel.send("I'm Joe Biden and I approve this message.");
             await message.channel.send("https://cdn.discordapp.com/attachments/942229872644870155/945402165365723146/Eyi1SNTXEAUvdWi.jpg");
+        } else if (message.content.toLowerCase().indexOf("ice cream") >= 0 && !message.author.bot){
+            await message.channel.send("https://images-ext-2.discordapp.net/external/7e7eeeFpDTpGG03L2O1Ada724rN-2AK0vQVJW-ySa6g/https/c.tenor.com/Ed9UCyWJNRcAAAAC/joe-biden-democrat.gif");
+        } else if (message.content.toLowerCase().indexOf("smell") >= 0 && !message.author.bot){
+            await message.channel.send("https://images-ext-1.discordapp.net/external/NBzRWM6bHuwA3jgLJvFp-3SlJL4s2eTElJVFZMgUv4U/https/c.tenor.com/7YE56XN5IdsAAAAC/joe-biden-vice-president.gif");
         }
     }
 }
