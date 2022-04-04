@@ -95,6 +95,10 @@ export class Bot implements Smokebot.Bot{
         } else if (message.content.toLowerCase().indexOf("smell") >= 0 && !message.author.bot){
             await message.channel.send("https://images-ext-1.discordapp.net/external/NBzRWM6bHuwA3jgLJvFp-3SlJL4s2eTElJVFZMgUv4U/https/c.tenor.com/7YE56XN5IdsAAAAC/joe-biden-vice-president.gif");
         }
+        
+        if (message.content.toLowerCase().indexOf("cum") >= 0 && !message.author.bot) {
+            await message.channel.send("https://tenor.com/bFbhT.gif");
+        }
     }
 }
 
