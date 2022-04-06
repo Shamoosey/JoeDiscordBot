@@ -91,7 +91,6 @@ export class Bot implements Smokebot.Bot{
                 }
 
             } else {
-                this._logger.info(`Incomming message "${message.content}" from ${message.author.username}`)
                 if (this._helper.StringContains(message.content, ["jack"])) {
                     returnMessage.push("LISTEN HERE JACK!")
                     returnMessage.push("https://cdn.discordapp.com/attachments/291815726426357760/945135820506038292/Z.png")
