@@ -25,8 +25,12 @@ export class Helper implements Smokebot.IHelper {
 
     public async SetStatus(message:string):Promise<string> {
         this._logger.info(`Changing status to "${message}"`)
-        await this._client.user.setActivity(message, {type: ActivityTypes.PLAYING})
-        return `Status changed to: ${message}`;
+        let returnMsg = "CAN'T CHANGE MY STATUS IF YOU DONT TELL ME WHAT YOU WANT JACK!";
+        if(message != ""){
+            await this._client.user.setActivity(message, {type: ActivityTypes.PLAYING})
+            returnMsg = `Status changed to: ${message}`;
+        }
+        return returnMsg
     }
 
     public GetHelpMessage(): string {
@@ -40,20 +44,33 @@ export class Helper implements Smokebot.IHelper {
         return returnMessage;
     }
 
-    
+    StringContains(str: string, contains:Array<string>): boolean {
+        let match = false;
+        str = str.toLowerCase();
+        for(let item of contains) {
+            if(str.indexOf(item.toLowerCase()) >= 0){
+                match = true;
+            }
+        }
+
+        return match;
+    }
+
     public async GetDadJoke(): Promise<string> {
-        let message:string; 
+        let message = "I SEEMED TO HAVE FUCKED SOMETHING UP, CAN'T DO THAT RIGHT NOW";
         try{
             let config:AxiosRequestConfig = {
                 headers:{
-                    Accept: "text/plain"
+                    "Accept": "application/json",
+                    "User-Agent": "https://github.com/Shamoosey"
                 }
             }
-            let response = await axios.get("https://icanhazdadjoke.com/", config)
-            message = response.data;
+            let response = await axios.get("https://icanhazdadjoke.com", config)
+            if(response.status == 200){
+                message = response.data.joke;
+            }
         } catch (e){
             this._logger.error("Error occured while requesting data joke", e)
-            message = "An error occured, try again"
         }
         return message;
     }
@@ -115,7 +132,7 @@ export class Helper implements Smokebot.IHelper {
                     this._logger.info(`${member.user.username} does not have an assigned role, adding to cache`);
                 } else if(role.name != "@everyone" && existingCachedMember) {
                     this._logger.info(`${member.user.username} is assigned a role, removing user from cache`);
-                    let index = this.noRoleMembers.delete(member.id)
+                    this.noRoleMembers.delete(member.id)
                 }
             }
         }
