@@ -111,6 +111,26 @@ export class Bot implements Smokebot.Bot{
                         await message.delete();
                     }
                     returnMessage.push("https://media.giphy.com/media/f9eYHQ8RZ4zfc4unXx/giphy.gif")
+                } else if (this._helper.StringContains(message.content, ["pumpiron"])){
+                    if(message.guild !== null){
+                        await message.delete();
+                    }
+                    returnMessage.push("https://media.giphy.com/media/fJliUiYbvEIoM/giphy.gif")
+                } else if (this._helper.StringContains(message.content, ["comon"])){
+                    if(message.guild !== null){
+                        await message.delete();
+                    }
+                    returnMessage.push("https://media.giphy.com/media/SWoRKslHVtqEasqYCJ/giphy.gif")
+                } else if (this._helper.StringContains(message.content, ["yapyap"])){
+                    if(message.guild !== null){
+                        await message.delete();
+                    }
+                    returnMessage.push("https://media.giphy.com/media/P18aB31TcT7DBpkyUh/giphy.gif")
+                } else if (this._helper.StringContains(message.content, ["tommy"])){
+                    if(message.guild !== null){
+                        await message.delete();
+                    }
+                    returnMessage.push("https://cdn.discordapp.com/attachments/559247137674887168/961416570519814144/unknown.png")
                 }
                 if (this._helper.StringContains(message.content, ["cum"])) {
                     returnMessage.push("https://tenor.com/bFbhT.gif");
