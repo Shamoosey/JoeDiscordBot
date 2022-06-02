@@ -131,6 +131,8 @@ export class Bot implements Smokebot.Bot{
                         await message.delete();
                     }
                     returnMessage.push("https://cdn.discordapp.com/attachments/559247137674887168/961416570519814144/unknown.png")
+                } else if (this._helper.StringContains(message.content, ["army"])){
+                    returnMessage.push("https://media.discordapp.net/attachments/306275893167521792/981707089674125392/Screenshot_20220601_034136.jpg?width=697&height=702")
                 }
                 if (this._helper.StringContains(message.content, ["cum"])) {
                     returnMessage.push("https://tenor.com/bFbhT.gif");
