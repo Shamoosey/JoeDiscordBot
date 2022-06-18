@@ -133,10 +133,13 @@ export class Bot implements Smokebot.Bot{
                     returnMessage.push("https://cdn.discordapp.com/attachments/559247137674887168/961416570519814144/unknown.png")
                 } else if (this._helper.StringContains(message.content, ["army"])){
                     returnMessage.push("https://media.discordapp.net/attachments/306275893167521792/981707089674125392/Screenshot_20220601_034136.jpg?width=697&height=702")
+                } else if (this._helper.StringContains(message.content, ["baked", "high", "420", "weed", "cooked", "roasted", "toasted", "stoner", "cannabis"])){
+                    returnMessage.push("https://cdn.discordapp.com/attachments/559247137674887168/987564534103408660/unknown.png")
                 }
                 if (this._helper.StringContains(message.content, ["cum"])) {
                     returnMessage.push("https://tenor.com/bFbhT.gif");
                 }
+
             }
             if(returnMessage.length > 0){
                 this._logger.info("Sending new message with items", returnMessage)
