@@ -44,12 +44,14 @@ export class Helper implements Smokebot.IHelper {
         return returnMessage;
     }
 
-    StringContains(str: string, contains:Array<string>): boolean {
+    StringContains(str: string, contains:Array<string>, wholeWord?:boolean): boolean {
         let match = false;
         str = str.toLowerCase();
-        for(let item of contains) {
-            if(str.indexOf(item.toLowerCase()) >= 0){
-                match = true;
+        for(let word of contains) {
+            if(wholeWord){
+                match = new RegExp('\\b' + word + '\\b', 'i').test(str);
+            } else {
+                match = str.indexOf(word.toLowerCase()) >= 0
             }
         }
 

@@ -9,6 +9,6 @@ export namespace Smokebot{
         GetDadJoke():Promise<string>;
         GetRandomNumber(min:number, max:number):number;
         FilterNonValidUsers(): Promise<void>;
-        StringContains(str: string, contains:Array<string>): boolean;
+        StringContains(str: string, contains:Array<string>, wholeWord?:boolean): boolean;
     }
 } 

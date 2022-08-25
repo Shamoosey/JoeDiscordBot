@@ -116,7 +116,7 @@ export class Bot implements Smokebot.Bot{
                         await message.delete();
                     }
                     returnMessage.push("https://media.giphy.com/media/fJliUiYbvEIoM/giphy.gif")
-                } else if (this._helper.StringContains(message.content, ["comon"])){
+                } else if (this._helper.StringContains(message.content, ["common"])){
                     if(message.guild !== null){
                         await message.delete();
                     }
@@ -136,7 +136,7 @@ export class Bot implements Smokebot.Bot{
                 } else if (this._helper.StringContains(message.content, ["baked", "high", "weed", "cooked", "roasted", "toasted", "stoner", "cannabis"])){
                     returnMessage.push("https://cdn.discordapp.com/attachments/559247137674887168/987564534103408660/unknown.png")
                 }
-                if (this._helper.StringContains(message.content, ["cum"])) {
+                if (this._helper.StringContains(message.content, ["cum"], true)) {
                     returnMessage.push("https://tenor.com/bFbhT.gif");
                 }
 
