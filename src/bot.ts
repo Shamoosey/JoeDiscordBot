@@ -81,9 +81,6 @@ export class Bot implements Smokebot.Bot{
                         break;
                     case Commands.Suggestion: 
                         returnMessage.push("HEY JACK! HELP ME OUT OVA HERE! https://forms.gle/tbdd7A7SyWFautpMA");
-                        if(message.guild !== null){
-                            message.delete();
-                        }
                         break;
                     case Commands.DadJoke: 
                         returnMessage.push(await this._helper.GetDadJoke());
@@ -106,8 +103,15 @@ export class Bot implements Smokebot.Bot{
                 } else if (this._helper.StringContains(message.content,["joe biden", "joe", "biden"])){
                     returnMessage.push("I'm Joe Biden and I approve this message.");
                     returnMessage.push("https://cdn.discordapp.com/attachments/942229872644870155/945402165365723146/Eyi1SNTXEAUvdWi.jpg");
-                } else if (this._helper.StringContains(message.content, ["ice cream"])){
-                    returnMessage.push("https://images-ext-2.discordapp.net/external/7e7eeeFpDTpGG03L2O1Ada724rN-2AK0vQVJW-ySa6g/https/c.tenor.com/Ed9UCyWJNRcAAAAC/joe-biden-democrat.gif");
+                } else if (this._helper.StringContains(message.content, ["ice cream", "icecream"])){
+                    let iceCream = [
+                        "https://media.discordapp.net/attachments/306275893167521792/1042448732366581930/image0.gif",
+                        "https://images-ext-2.discordapp.net/external/7e7eeeFpDTpGG03L2O1Ada724rN-2AK0vQVJW-ySa6g/https/c.tenor.com/Ed9UCyWJNRcAAAAC/joe-biden-democrat.gif",
+                        "https://media.giphy.com/media/uNJj3pVSvQbd9YDwUY/giphy.gif",
+                        "https://media.giphy.com/media/Z8J5EHEOCDhwBdeyzB/giphy.gif",
+                        "https://media.giphy.com/media/ZsWHLPrzcgBg4CxfQq/giphy.gif"
+                    ];
+                    returnMessage.push(iceCream[this._helper.GetRandomNumber(0, iceCream.length - 1)]);
                 } else if (this._helper.StringContains(message.content, ["smell"])){
                     returnMessage.push("https://images-ext-1.discordapp.net/external/NBzRWM6bHuwA3jgLJvFp-3SlJL4s2eTElJVFZMgUv4U/https/c.tenor.com/7YE56XN5IdsAAAAC/joe-biden-vice-president.gif");
                 } else if (this._helper.StringContains(message.content, ["politics"])){
@@ -122,17 +126,17 @@ export class Bot implements Smokebot.Bot{
                         await message.delete();
                     }
                     returnMessage.push("https://media.giphy.com/media/fJliUiYbvEIoM/giphy.gif")
-                } else if (this._helper.StringContains(message.content, ["common"])){
+                } else if (this._helper.StringContains(message.content, ["common"], true)){
                     if(message.guild !== null){
                         await message.delete();
                     }
                     returnMessage.push("https://media.giphy.com/media/SWoRKslHVtqEasqYCJ/giphy.gif")
-                } else if (this._helper.StringContains(message.content, ["yapyap"])){
+                } else if (this._helper.StringContains(message.content, ["yapyap"], true)){
                     if(message.guild !== null){
                         await message.delete();
                     }
                     returnMessage.push("https://media.giphy.com/media/P18aB31TcT7DBpkyUh/giphy.gif")
-                } else if (this._helper.StringContains(message.content, ["tommy"])){
+                } else if (this._helper.StringContains(message.content, ["tommy"], true)){
                     if(message.guild !== null){
                         await message.delete();
                     }
