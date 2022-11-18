@@ -49,9 +49,9 @@ export class Helper implements Smokebot.IHelper {
         str = str.toLowerCase();
         for(let word of contains) {
             if(wholeWord){
-                match = new RegExp('\\b' + word + '\\b', 'i').test(str);
+                match = match || new RegExp('\\b' + word + '\\b', 'i').test(str);
             } else {
-                match = str.indexOf(word.toLowerCase()) >= 0
+                match = match || str.indexOf(word.toLowerCase()) >= 0
             }
         }
 
@@ -78,7 +78,7 @@ export class Helper implements Smokebot.IHelper {
     }
 
     public GetRandomNumber(min:number, max:number):number{
-        return Math.floor(Math.random() * (max - min) ) + min;
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
     public async FilterNonValidUsers(): Promise<void>{
