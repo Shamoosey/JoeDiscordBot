@@ -2,7 +2,8 @@ export enum Commands {
     Status = "status",
     Help = "help",
     WeedBad = "weedbad",
-    DadJoke = "dadjoke"
+    DadJoke = "dadjoke",
+    Suggestion = "suggestion"
 }
 
 export enum ActivityTypes {

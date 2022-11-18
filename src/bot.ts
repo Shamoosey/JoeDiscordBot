@@ -80,10 +80,13 @@ export class Bot implements Smokebot.Bot{
                         }
                         break;
                     case Commands.DadJoke: 
-                        returnMessage.push(await this._helper.GetDadJoke());
+                        returnMessage.push("HEY JACK! HELP ME OUT OVA HERE! https://forms.gle/tbdd7A7SyWFautpMA");
                         if(message.guild !== null){
                             message.delete();
                         }
+                        break;
+                    case Commands.DadJoke: 
+                        returnMessage.push(await this._helper.GetDadJoke());
                         break;
                     default: 
                         returnMessage.push(jsonHelper.helpMessages[this._helper.GetRandomNumber(0, jsonHelper.helpMessages.length - 1)].replace("${help}", `${process.env.PREFIX}help`))
