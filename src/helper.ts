@@ -1,12 +1,12 @@
-import { Client, GuildMember, TextChannel } from "discord.js";
+import { Client, GuildMember, Message, TextChannel } from "discord.js";
 import {inject, injectable} from "inversify";
 import {Commands, ActivityTypes} from "./enums"
-import {Smokebot} from "./interfaces"
+import {Joebot} from "./interfaces"
 import axios, { AxiosRequestConfig } from 'axios';
 import { Logger } from "winston";
 
 @injectable()
-export class Helper implements Smokebot.IHelper {
+export class Helper implements Joebot.Helper {
     private _client: Client;
     private _logger: Logger;
 
@@ -48,10 +48,11 @@ export class Helper implements Smokebot.IHelper {
         let match = false;
         str = str.toLowerCase();
         for(let word of contains) {
+            let formattedWord = word.toLowerCase();
             if(wholeWord){
-                match = match || new RegExp('\\b' + word.toLowerCase() + '\\b', 'i').test(str);
+                match = match || new RegExp('\\b' + formattedWord + '\\b', 'i').test(str);
             } else {
-                match = match || str.indexOf(word.toLowerCase()) >= 0
+                match = match || str.indexOf(formattedWord) >= 0
             }
         }
 
@@ -121,6 +122,15 @@ export class Helper implements Smokebot.IHelper {
                 }
             }
         }
+    }
+
+    public async FetchLastMessages(message:Message): Promise<void> {
+        // let channel = await message.channel.fetch();
+        // let messages = await channel.messages.fetch({limit: 10}, {cache: false});
+        // for(let message of messages){
+        //     //todo add logic to screen messages
+        //     if(message[1].content.c)
+        // }
     }
     
     private async updateCachedMembers(guild:string): Promise<void> {

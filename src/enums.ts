@@ -13,3 +13,21 @@ export enum ActivityTypes {
     WATCHING = "WATCHING",
     COMPETING = "COMPETING"
 }
+
+export enum TriggerKeys {
+    Jack = "jack",
+    Joe = "joe",
+    Cornpop = "cornpop",
+    Icecream = "icecream",
+    Smell = "smell",
+    Politics = "politics",
+    WhatNowSon = "whatnowson",
+    PumpIron = "pumpiron",
+    YapYap = "yapyap",
+    Tommy = "tommy",
+    Army = "army",
+    Baked = "baked", 
+    BingChilling = "bingchilling",
+    Murica = "murica",
+    Come = "come"
+}
