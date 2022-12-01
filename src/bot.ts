@@ -1,28 +1,32 @@
 import { Client, Message} from "discord.js";
 import {inject, injectable} from "inversify";
-import { Commands} from "./enums"
+import { Commands, TriggerKeys} from "./enums"
 import { CronJob } from 'cron';
 import jsonHelper from "./data/jsonHelper.json"
-import { Smokebot } from "./interfaces";
+import { Joebot } from "./interfaces";
 import { Logger } from "winston";
+import { Triggers } from "./Triggers";
 
 @injectable()
-export class Bot implements Smokebot.Bot{
+export class Bot implements Joebot.Bot{
     private _client: Client;
     private readonly _token: string;
-    private _helper: Smokebot.IHelper;
+    private _helper: Joebot.Helper;
     private _logger: Logger;
+    private _triggers: Joebot.Triggers
 
     constructor(
         @inject("Client") client: Client,
         @inject("Token") token: string,
-        @inject("Helper") helper: Smokebot.IHelper,
+        @inject("Helper") helper: Joebot.Helper,
         @inject("Logger") logger: Logger,
+        @inject("Triggers") Triggers: Triggers
     ) {
         this._client = client;
         this._token = token;
         this._helper = helper;
         this._logger = logger;
+        this._triggers = Triggers;
     }
 
     public async Run(): Promise<void> {
@@ -58,14 +62,27 @@ export class Bot implements Smokebot.Bot{
     }
 
     private async onMessage(message:Message): Promise<void>{
+        await this._helper.FetchLastMessages(message)
         if(!message.author.bot){
-            let returnMessage: Array<string> = [];
+            let returnMessage = new Array<string>();
             if(message.content.startsWith(process.env.PREFIX) && !message.author.bot){
                 this._logger.info(`Incomming command "${message.content}" from ${message.author.username}`)
-                returnMessage = [...returnMessage, ...await this.checkCommands(message)]
+                returnMessage = await this.checkCommands(message);
             } else {
-                returnMessage =  [...returnMessage, ...await this.checkTriggers(message)];
+                let triggerValue = this._triggers.GetResponseFromString(message.content);
+                if(triggerValue) {
+                    if(triggerValue.SendRandomResponse){
+                        returnMessage.push(triggerValue.Responses[this._helper.GetRandomNumber(0, triggerValue.Responses.length - 1)]);
+                    } else {
+                        returnMessage = triggerValue.Responses;
+                    }
+
+                    if(triggerValue.MessageDelete && message.guild !== null){
+                        await message.delete();
+                    }
+                }
             }
+            
             if(returnMessage.length > 0){
                 this._logger.info("Sending new message with items", returnMessage)
                 for(let msg of returnMessage) {
@@ -109,72 +126,6 @@ export class Bot implements Smokebot.Bot{
         }
 
         return returnMessage;
-    }
-
-    private async checkTriggers(message:Message):Promise<Array<string>> {
-        let returnMessages = new Array<string>();
-
-        if (this._helper.StringContains(message.content, ["jack"], false)) {
-            returnMessages.push("LISTEN HERE JACK!")
-            returnMessages.push("https://cdn.discordapp.com/attachments/291815726426357760/945135820506038292/Z.png")
-        } else if (this._helper.StringContains(message.content, ["cornpop", "corn pop"])){
-            returnMessages.push("HE WAS A BAD DUDE!")
-            returnMessages.push("https://cdn.discordapp.com/attachments/291815726426357760/945136211167703101/skynews-joe-biden-president_5645676.png")
-        } else if (this._helper.StringContains(message.content,["joe biden", "joe", "biden"], false)){
-            returnMessages.push("I'm Joe Biden and I approve this message.");
-            returnMessages.push("https://cdn.discordapp.com/attachments/942229872644870155/945402165365723146/Eyi1SNTXEAUvdWi.jpg");
-        } else if (this._helper.StringContains(message.content, ["ice cream", "icecream"])){
-            let iceCream = [
-                "https://media.discordapp.net/attachments/306275893167521792/1042448732366581930/image0.gif",
-                "https://images-ext-2.discordapp.net/external/7e7eeeFpDTpGG03L2O1Ada724rN-2AK0vQVJW-ySa6g/https/c.tenor.com/Ed9UCyWJNRcAAAAC/joe-biden-democrat.gif",
-                "https://media.giphy.com/media/uNJj3pVSvQbd9YDwUY/giphy.gif",
-                "https://media.giphy.com/media/Z8J5EHEOCDhwBdeyzB/giphy.gif",
-                "https://media.giphy.com/media/ZsWHLPrzcgBg4CxfQq/giphy.gif"
-            ];
-            returnMessages.push(iceCream[this._helper.GetRandomNumber(0, iceCream.length - 1)]);
-        } else if (this._helper.StringContains(message.content, ["smell"])){
-            returnMessages.push("https://images-ext-1.discordapp.net/external/NBzRWM6bHuwA3jgLJvFp-3SlJL4s2eTElJVFZMgUv4U/https/c.tenor.com/7YE56XN5IdsAAAAC/joe-biden-vice-president.gif");
-        } else if (this._helper.StringContains(message.content, ["politics"])){
-            returnMessages.push("https://tenor.com/view/shut-up-man-will-you-gif-18636332")
-        } else if (this._helper.StringContains(message.content, ["whatnowson"])){
-            if(message.guild !== null){
-                await message.delete();
-            }
-            returnMessages.push("https://media.giphy.com/media/f9eYHQ8RZ4zfc4unXx/giphy.gif")
-        } else if (this._helper.StringContains(message.content, ["pumpiron"])){
-            if(message.guild !== null){
-                await message.delete();
-            }
-            returnMessages.push("https://media.giphy.com/media/fJliUiYbvEIoM/giphy.gif")
-        } else if (this._helper.StringContains(message.content, ["common"])){
-            if(message.guild !== null){
-                await message.delete();
-            }
-            returnMessages.push("https://media.giphy.com/media/SWoRKslHVtqEasqYCJ/giphy.gif")
-        } else if (this._helper.StringContains(message.content, ["yapyap"])){
-            if(message.guild !== null){
-                await message.delete();
-            }
-            returnMessages.push("https://media.giphy.com/media/P18aB31TcT7DBpkyUh/giphy.gif")
-        } else if (this._helper.StringContains(message.content, ["tommy"])){
-            returnMessages.push("https://cdn.discordapp.com/attachments/559247137674887168/961416570519814144/unknown.png")
-        } else if (this._helper.StringContains(message.content, ["army"])){
-            returnMessages.push("https://media.discordapp.net/attachments/306275893167521792/981707089674125392/Screenshot_20220601_034136.jpg?width=697&height=702")
-        } else if (this._helper.StringContains(message.content, ["baked", "high", "weed", "cooked", "roasted", "toasted", "stoner", "cannabis"])){
-            returnMessages.push("https://cdn.discordapp.com/attachments/559247137674887168/987564534103408660/unknown.png")
-        } else if(this._helper.StringContains(message.content, ["bing chilling", "bingchilling"])){
-            returnMessages.push("https://cdn.discordapp.com/attachments/306275893167521792/1042456167173079060/unknown.png");
-        } else if(this._helper.StringContains(message.content, ["god", "america", "murica"])){
-            returnMessages.push("https://media.giphy.com/media/oxCtqUm9PhXvA0oXnp/giphy-downsized-large.gif");
-        }
-
-
-        if (this._helper.StringContains(message.content, ["cum"])) {
-            returnMessages.push("https://tenor.com/bFbhT.gif");
-        }
-
-
-        return returnMessages;
     }
 }
 
