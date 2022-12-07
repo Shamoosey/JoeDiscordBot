@@ -6,9 +6,8 @@ import { TriggerKeys } from "./enums";
 export class Triggers implements Joebot.Triggers {
     private _helper: Joebot.Helper
 
-    constructor
-    (
-        @inject("Helper") helper: Joebot.Helper,
+    constructor (
+        @inject("Helper") helper: Joebot.Helper
     ) {
         this._helper = helper
     }
@@ -20,7 +19,8 @@ export class Triggers implements Joebot.Triggers {
                 Responses: [
                     "LISTEN HERE JACK!",
                     "https://cdn.discordapp.com/attachments/291815726426357760/945135820506038292/Z.png"
-                ]
+                ],
+                IgnoreCooldown: true,
             }
         ],
         [
@@ -60,7 +60,8 @@ export class Triggers implements Joebot.Triggers {
                 TriggerWords: ["smell"],
                 Responses: [ 
                     "https://images-ext-1.discordapp.net/external/NBzRWM6bHuwA3jgLJvFp-3SlJL4s2eTElJVFZMgUv4U/https/c.tenor.com/7YE56XN5IdsAAAAC/joe-biden-vice-president.gif" 
-                ]
+                ],
+                IgnoreCooldown: true
             }
         ],
         [
@@ -68,7 +69,8 @@ export class Triggers implements Joebot.Triggers {
                 TriggerWords: ["politics"],
                 Responses: [
                     "https://tenor.com/view/shut-up-man-will-you-gif-18636332"
-                ]
+                ],
+                IgnoreCooldown: true
             }
         ],
         [
@@ -77,7 +79,8 @@ export class Triggers implements Joebot.Triggers {
                 Responses: [
                     "https://media.giphy.com/media/f9eYHQ8RZ4zfc4unXx/giphy.gif"
                 ],
-                MessageDelete: true
+                MessageDelete: true,
+                IgnoreCooldown: true
             }
         ],
         [
@@ -85,7 +88,8 @@ export class Triggers implements Joebot.Triggers {
                 TriggerWords: ["pumpiron"],
                 Responses: [
                     "https://media.giphy.com/media/fJliUiYbvEIoM/giphy.gif"
-                ]
+                ],
+                IgnoreCooldown: true
             } 
         ],
         [
@@ -94,7 +98,8 @@ export class Triggers implements Joebot.Triggers {
                 Responses: [
                     "https://media.giphy.com/media/P18aB31TcT7DBpkyUh/giphy.gif"
                 ],
-                MessageDelete: true
+                MessageDelete: true,
+                IgnoreCooldown: true
             }
         ],
         [
@@ -102,7 +107,9 @@ export class Triggers implements Joebot.Triggers {
                 TriggerWords: ["tommy"],
                 Responses: [
                     "https://cdn.discordapp.com/attachments/559247137674887168/961416570519814144/unknown.png"
-                ]
+                ],
+                MessageDelete: true,
+                IgnoreCooldown: true
             }
         ],
         [
@@ -144,6 +151,17 @@ export class Triggers implements Joebot.Triggers {
                     "https://tenor.com/bFbhT.gif"
                 ]
             } 
+        ],
+        [
+            TriggerKeys.Lawyer, {
+                TriggerWords: ["lawyer"],
+                Responses: [
+                    "https://cdn.discordapp.com/attachments/306275893167521792/1049551060773109800/DALLE_2022-12-05_23.01.09_-_Saul_Goodman_as_a_character_in_fortnite.png",
+                    "https://media.discordapp.net/attachments/306275893167521792/1049551235780456448/DALLE_2022-12-05_23.01.47_-_Saul_Goodman_as_a_character_in_fortnite.png?width=702&height=702",
+                    "https://media.discordapp.net/attachments/306275893167521792/1049551236111794206/DALLE_2022-12-05_23.01.49_-_Saul_Goodman_as_a_character_in_fortnite.png?width=702&height=702"
+                ],
+                SendRandomResponse: true
+            }
         ]
     ])
 
@@ -155,4 +173,6 @@ export class Triggers implements Joebot.Triggers {
         }
         return undefined;
     }
+
+    CheckTriggerValid
 }

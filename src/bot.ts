@@ -62,27 +62,15 @@ export class Bot implements Joebot.Bot{
     }
 
     private async onMessage(message:Message): Promise<void>{
-        await this._helper.FetchLastMessages(message)
         if(!message.author.bot){
             let returnMessage = new Array<string>();
             if(message.content.startsWith(process.env.PREFIX) && !message.author.bot){
                 this._logger.info(`Incomming command "${message.content}" from ${message.author.username}`)
                 returnMessage = await this.checkCommands(message);
             } else {
-                let triggerValue = this._triggers.GetResponseFromString(message.content);
-                if(triggerValue) {
-                    if(triggerValue.SendRandomResponse){
-                        returnMessage.push(triggerValue.Responses[this._helper.GetRandomNumber(0, triggerValue.Responses.length - 1)]);
-                    } else {
-                        returnMessage = triggerValue.Responses;
-                    }
-
-                    if(triggerValue.MessageDelete && message.guild !== null){
-                        await message.delete();
-                    }
-                }
+                returnMessage = await this.checkTriggers(message);
             }
-            
+
             if(returnMessage.length > 0){
                 this._logger.info("Sending new message with items", returnMessage)
                 for(let msg of returnMessage) {
@@ -90,6 +78,35 @@ export class Bot implements Joebot.Bot{
                 }
             }
         }
+    }
+
+    private async checkTriggers(message:Message): Promise<Array<string>> {
+        let returnMessage = new Array<string>();
+        let triggerValue = this._triggers.GetResponseFromString(message.content);
+        if(triggerValue) {
+            let triggerOnCooldown = false;
+            let recentMessages = await this._helper.GetRecentMessages(message);
+            for( const [key, value] of recentMessages){
+                if(value.author.id == this._client.user.id){
+                    if(triggerValue.Responses.includes(value.content)){
+                        triggerOnCooldown = true;
+                        break;
+                    }
+                }
+            }
+            if(!triggerOnCooldown || triggerValue.IgnoreCooldown){
+                if(triggerValue.SendRandomResponse){
+                    returnMessage.push(triggerValue.Responses[this._helper.GetRandomNumber(0, triggerValue.Responses.length - 1)]);
+                } else {
+                    returnMessage = triggerValue.Responses;
+                }
+
+                if(triggerValue.MessageDelete && message.guild !== null){
+                    await message.delete();
+                }
+            }
+        }
+        return returnMessage;
     }
 
     private async checkCommands(message:Message): Promise<Array<string>> {

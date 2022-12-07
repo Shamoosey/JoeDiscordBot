@@ -29,5 +29,6 @@ export enum TriggerKeys {
     Baked = "baked", 
     BingChilling = "bingchilling",
     Murica = "murica",
-    Come = "come"
+    Come = "come",
+    Lawyer = "lawyer"
 }

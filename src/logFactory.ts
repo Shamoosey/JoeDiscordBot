@@ -7,15 +7,15 @@ export abstract class LogFactory {
     private static tsFormat = moment().format('YYYY-MM-DD hh:mm:ss').trim();
     private static logLevel = "info"
 
-    private static fileTransport = new DailyRotateFile ({
-        filename: "bidenbot-%DATE%.log",
-        datePattern: "YYYY-MM-DD-HH",
-        dirname: "./logs",
-        maxFiles: '7d'
-    });
+    // private static fileTransport = new DailyRotateFile ({
+    //     filename: "bidenbot-%DATE%.log",
+    //     datePattern: "YYYY-MM-DD-HH",
+    //     dirname: "./logs",
+    //     maxFiles: '7d',
+    // });
 
     private static httpTransport = new Http({
-        host: "192.168.0.123",
+        host: "localhost",
         port: 12202 ,
         path: "/gelf",
         format: LogFactory.getLogformat()
@@ -25,7 +25,7 @@ export abstract class LogFactory {
         let logger = createLogger({
             level: this.logLevel,
             transports: [
-                this.fileTransport,
+                // this.fileTransport,
                 this.httpTransport,
             ],
             format: LogFactory.getLogformat()

@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Collection, Message } from "discord.js";
 import { TriggerKeys } from "./enums";
 
 export namespace Joebot{
@@ -13,7 +13,7 @@ export namespace Joebot{
         GetRandomNumber(min:number, max:number):number;
         FilterNonValidUsers(): Promise<void>;
         StringContains(str: string, contains:Array<string>, wholeWord?:boolean): boolean;
-        FetchLastMessages(message:Message):Promise<void>;
+        GetRecentMessages(message:Message, count?: number):Promise<Collection<string, Message<boolean>>>;
     }
 
     export interface Triggers {
@@ -25,5 +25,6 @@ export namespace Joebot{
         Responses: Array<string>;
         MessageDelete?: boolean;
         SendRandomResponse?: boolean;
+        IgnoreCooldown?: boolean;
     }
 } 
