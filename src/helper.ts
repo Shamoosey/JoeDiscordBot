@@ -1,4 +1,4 @@
-import { Client, GuildMember, Message, TextChannel } from "discord.js";
+import { Client, Collection, GuildMember, Message, TextChannel } from "discord.js";
 import {inject, injectable} from "inversify";
 import {Commands, ActivityTypes} from "./enums"
 import {Joebot} from "./interfaces"
@@ -124,13 +124,11 @@ export class Helper implements Joebot.Helper {
         }
     }
 
-    public async FetchLastMessages(message:Message): Promise<void> {
-        // let channel = await message.channel.fetch();
-        // let messages = await channel.messages.fetch({limit: 10}, {cache: false});
-        // for(let message of messages){
-        //     //todo add logic to screen messages
-        //     if(message[1].content.c)
-        // }
+    public async GetRecentMessages(message:Message, count: number = 20): Promise<Collection<string, Message<boolean>>> {
+        let returnedMessages = new Map<string, string>();
+        let channel = await message.channel.fetch();
+        let channelMessages = await channel.messages.fetch({limit: count}, {cache: false});
+        return channelMessages;
     }
     
     private async updateCachedMembers(guild:string): Promise<void> {
