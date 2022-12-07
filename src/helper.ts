@@ -125,7 +125,7 @@ export class Helper implements Joebot.Helper {
     }
 
     public async GetRecentMessages(message:Message, count: number = 20): Promise<Collection<string, Message<boolean>>> {
-        let returnedMessages = new Map<string, string>();
+        this._logger.info(`Checking last ${count} messages in channel`, message.channel);
         let channel = await message.channel.fetch();
         let channelMessages = await channel.messages.fetch({limit: count}, {cache: false});
         return channelMessages;

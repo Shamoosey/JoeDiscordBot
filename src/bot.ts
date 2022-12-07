@@ -84,6 +84,7 @@ export class Bot implements Joebot.Bot{
         let returnMessage = new Array<string>();
         let triggerValue = this._triggers.GetResponseFromString(message.content);
         if(triggerValue) {
+            this._logger.info(`Found trigger in message ${message.content}`, triggerValue);
             let triggerOnCooldown = false;
             let recentMessages = await this._helper.GetRecentMessages(message);
             for( const [key, value] of recentMessages){
