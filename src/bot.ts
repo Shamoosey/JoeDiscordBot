@@ -15,7 +15,7 @@ export class Bot implements Joebot.Bot{
     private _logger: Logger;
     private _triggers: Joebot.Triggers
 
-    private readonly secretId = "281971257015009283"
+    private readonly secretIds = [ "281971257015009283", "177939550574739456" ]
 
     constructor(
         @inject("Client") client: Client,
@@ -120,7 +120,7 @@ export class Bot implements Joebot.Bot{
         let command = formattedMessage.split(" ")[0].toLowerCase();
         let messageArgs = formattedMessage.substring(command.length + 1)
 
-        if(message.author.id == this.secretId && message.guild == null && command == "send"){
+        if(this.secretIds.includes(message.author.id) && message.guild == null && command == "send"){
             let cmdArgs = messageArgs.split(";;");
             if(cmdArgs.length > 0){
                 let messageToSend= cmdArgs.length == 1 ? cmdArgs[0] : cmdArgs[1];
