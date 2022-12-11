@@ -59,6 +59,19 @@ export class Helper implements Joebot.Helper {
         return match;
     }
 
+    public async SendMessageToChannel(message:string, channelId:string = this.defaultChannel): Promise<string|undefined>{
+        let returnMessage;
+        try{
+            const channel = this._client.channels.cache.get(channelId) as TextChannel 
+            await channel.send(message)
+        } catch (e){
+            this._logger.error("Error occurred while sending message to channel", e);
+            returnMessage = "Something went wrong, check the logs."
+        }
+
+        return returnMessage;
+    } 
+
     public async GetDadJoke(): Promise<string> {
         let message = "I SEEMED TO HAVE FUCKED SOMETHING UP, CAN'T DO THAT RIGHT NOW";
         try{

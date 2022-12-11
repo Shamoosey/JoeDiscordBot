@@ -14,6 +14,7 @@ export namespace Joebot{
         FilterNonValidUsers(): Promise<void>;
         StringContains(str: string, contains:Array<string>, wholeWord?:boolean): boolean;
         GetRecentMessages(message:Message, count?: number):Promise<Collection<string, Message<boolean>>>;
+        SendMessageToChannel(message:string, channelId?: string, ): Promise<string|undefined>;
     }
 
     export interface Triggers {

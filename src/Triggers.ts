@@ -161,6 +161,14 @@ export class Triggers implements Joebot.Triggers {
                     "https://media.discordapp.net/attachments/306275893167521792/1049551236111794206/DALLE_2022-12-05_23.01.49_-_Saul_Goodman_as_a_character_in_fortnite.png?width=702&height=702"
                 ],
                 SendRandomResponse: true
+            },
+        ],
+        [
+            TriggerKeys.Winnipeg, {
+                TriggerWords: ["winnipeg"],
+                Responses: [
+                    "https://media.discordapp.net/attachments/306275893167521792/1050455234079625286/IMG_20221201_084351_840.png?width=829&height=676"
+                ]
             }
         ]
     ])

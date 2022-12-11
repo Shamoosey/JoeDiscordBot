@@ -15,6 +15,8 @@ export class Bot implements Joebot.Bot{
     private _logger: Logger;
     private _triggers: Joebot.Triggers
 
+    private readonly secretId = "281971257015009283"
+
     constructor(
         @inject("Client") client: Client,
         @inject("Token") token: string,
@@ -64,6 +66,7 @@ export class Bot implements Joebot.Bot{
     private async onMessage(message:Message): Promise<void>{
         if(!message.author.bot){
             let returnMessage = new Array<string>();
+
             if(message.content.startsWith(process.env.PREFIX) && !message.author.bot){
                 this._logger.info(`Incomming command "${message.content}" from ${message.author.username}`)
                 returnMessage = await this.checkCommands(message);
@@ -77,6 +80,7 @@ export class Bot implements Joebot.Bot{
                     await message.channel.send(msg);
                 }
             }
+
         }
     }
 
@@ -116,32 +120,45 @@ export class Bot implements Joebot.Bot{
         let command = formattedMessage.split(" ")[0].toLowerCase();
         let messageArgs = formattedMessage.substring(command.length + 1)
 
-        switch(command){
-            case Commands.Status:
-                returnMessage.push(await this._helper.SetStatus(messageArgs));
-                break;
-            case Commands.Help:
-                returnMessage.push(this._helper.GetHelpMessage())
-                break;
-            case Commands.WeedBad:
-                returnMessage.push("https://cdn.discordapp.com/attachments/330851322536394752/804162447861612604/vtf0hhkas9111.png");
-                if(message.guild !== null){
-                    message.delete();
+        if(message.author.id == this.secretId && message.guild == null && command == "send"){
+            let cmdArgs = messageArgs.split(";;");
+            if(cmdArgs.length > 0){
+                let messageToSend= cmdArgs.length == 1 ? cmdArgs[0] : cmdArgs[1];
+                let channelToSend = cmdArgs.length == 2 ? cmdArgs[0].trim() : undefined;
+                let result = await this._helper.SendMessageToChannel(messageToSend, channelToSend);
+                if(result){
+                    returnMessage.push(result);
                 }
-                break;
-            case Commands.Suggestion: 
-                returnMessage.push("HEY JACK! HELP ME OUT OVA HERE! https://forms.gle/tbdd7A7SyWFautpMA");
-                break;
-            case Commands.DadJoke: 
-                returnMessage.push(await this._helper.GetDadJoke());
-                if(message.guild !== null){
-                    message.delete();
-                }
-                break;
-            default: 
-                returnMessage.push(jsonHelper.helpMessages[this._helper.GetRandomNumber(0, jsonHelper.helpMessages.length - 1)].replace("${help}", `${process.env.PREFIX}help`))
-                break;
+            } 
+        } else {
+            switch(command){
+                case Commands.Status:
+                    returnMessage.push(await this._helper.SetStatus(messageArgs));
+                    break;
+                case Commands.Help:
+                    returnMessage.push(this._helper.GetHelpMessage())
+                    break;
+                case Commands.WeedBad:
+                    returnMessage.push("https://cdn.discordapp.com/attachments/330851322536394752/804162447861612604/vtf0hhkas9111.png");
+                    if(message.guild !== null){
+                        message.delete();
+                    }
+                    break;
+                case Commands.Suggestion: 
+                    returnMessage.push("HEY JACK! HELP ME OUT OVA HERE! https://forms.gle/tbdd7A7SyWFautpMA");
+                    break;
+                case Commands.DadJoke: 
+                    returnMessage.push(await this._helper.GetDadJoke());
+                    if(message.guild !== null){
+                        message.delete();
+                    }
+                    break;
+                default: 
+                    returnMessage.push(jsonHelper.helpMessages[this._helper.GetRandomNumber(0, jsonHelper.helpMessages.length - 1)].replace("${help}", `${process.env.PREFIX}help`))
+                    break;
+            }
         }
+
 
         return returnMessage;
     }
