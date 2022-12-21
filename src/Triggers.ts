@@ -173,6 +173,15 @@ export class Triggers implements Joebot.Triggers {
                     "https://media.discordapp.net/attachments/306275893167521792/1050455234079625286/IMG_20221201_084351_840.png?width=829&height=676"
                 ]
             }
+        ],
+        [
+            TriggerKeys.Brandon, {
+                TriggerWords: ["brandon"],
+                Responses: [
+                    "https://cdn.discordapp.com/attachments/942229872644870155/1054971360935428126/image.png"
+                ],
+                ReactEmote: "brandon"
+            }
         ]
     ])
 

@@ -31,5 +31,6 @@ export enum TriggerKeys {
     Murica = "murica",
     Come = "come",
     Lawyer = "lawyer",
-    Winnipeg = "winnipeg"
+    Winnipeg = "winnipeg",
+    Brandon = "brandon"
 }
