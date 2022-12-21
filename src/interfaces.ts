@@ -27,5 +27,6 @@ export namespace Joebot{
         MessageDelete?: boolean;
         SendRandomResponse?: boolean;
         IgnoreCooldown?: boolean;
+        ReactEmote?: string;
     }
 } 

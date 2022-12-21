@@ -38,7 +38,8 @@ export class Triggers implements Joebot.Triggers {
                 Responses: [
                     "I'm Joe Biden and I approve this message.",
                     "https://cdn.discordapp.com/attachments/942229872644870155/945402165365723146/Eyi1SNTXEAUvdWi.jpg"
-                ]
+                ],
+                ReactEmote: "joeCD"
             }
         ],
         [
@@ -133,7 +134,8 @@ export class Triggers implements Joebot.Triggers {
                 TriggerWords: ["bing chilling", "bingchilling"],
                 Responses: [
                     "https://cdn.discordapp.com/attachments/306275893167521792/1042456167173079060/unknown.png"
-                ]
+                ],
+                ReactEmote: "bingchillinCD"
             }
         ],
         [ 
@@ -149,7 +151,8 @@ export class Triggers implements Joebot.Triggers {
                 TriggerWords: ["cum"],
                 Responses: [
                     "https://tenor.com/bFbhT.gif"
-                ]
+                ],
+                ReactEmote: "GachiGasm"
             } 
         ],
         [

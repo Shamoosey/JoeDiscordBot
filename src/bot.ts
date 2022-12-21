@@ -66,8 +66,7 @@ export class Bot implements Joebot.Bot{
     private async onMessage(message:Message): Promise<void>{
         if(!message.author.bot){
             let returnMessage = new Array<string>();
-
-            if(message.content.startsWith(process.env.PREFIX) && !message.author.bot){
+            if(message.content.startsWith(process.env.PREFIX)){
                 this._logger.info(`Incomming command "${message.content}" from ${message.author.username}`)
                 returnMessage = await this.checkCommands(message);
             } else {
@@ -97,6 +96,12 @@ export class Bot implements Joebot.Bot{
                         triggerOnCooldown = true;
                         break;
                     }
+                }
+            }
+            if(triggerValue.ReactEmote){
+                const emote = this._client.emojis.cache.find(emoji => emoji.name === triggerValue.ReactEmote);
+                if(emote) {
+                    await message.react(emote);
                 }
             }
             if(!triggerOnCooldown || triggerValue.IgnoreCooldown){
