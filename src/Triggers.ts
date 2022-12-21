@@ -182,6 +182,14 @@ export class Triggers implements Joebot.Triggers {
                 ],
                 ReactEmote: "brandon"
             }
+        ],
+        [
+            TriggerKeys.Twitter, {
+                TriggerWords: ["twitter"],
+                Responses: [
+                    "https://i.imgur.com/S3JoQbh.jpg"
+                ]
+            }
         ]
     ])
 
