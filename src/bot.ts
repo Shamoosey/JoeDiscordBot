@@ -66,11 +66,15 @@ export class Bot implements Joebot.Bot{
     private async onMessage(message:Message): Promise<void>{
         if(!message.author.bot){
             let returnMessage = new Array<string>();
-            if(message.content.startsWith(process.env.PREFIX)){
-                this._logger.info(`Incomming command "${message.content}" from ${message.author.username}`)
-                returnMessage = await this.checkCommands(message);
+            if(message.mentions.has(this._client.user.id)){
+                returnMessage = this._triggers.DefaultResponses;
             } else {
-                returnMessage = await this.checkTriggers(message);
+                if(message.content.startsWith(process.env.PREFIX)){
+                    this._logger.info(`Incomming command "${message.content}" from ${message.author.username}`)
+                    returnMessage = await this.checkCommands(message);
+                } else {
+                    returnMessage = await this.checkTriggers(message);
+                }
             }
 
             if(returnMessage.length > 0){
@@ -79,7 +83,6 @@ export class Bot implements Joebot.Bot{
                     await message.channel.send(msg);
                 }
             }
-
         }
     }
 
@@ -98,13 +101,15 @@ export class Bot implements Joebot.Bot{
                     }
                 }
             }
-            if(triggerValue.ReactEmote){
-                const emote = this._client.emojis.cache.find(emoji => emoji.name === triggerValue.ReactEmote);
+            if(triggerValue.ReactEmote && triggerValue.ReactEmote.length > 0 && !triggerValue.MessageDelete){
+                let emoteString = triggerValue.ReactEmote[this._helper.GetRandomNumber(0, triggerValue.ReactEmote.length - 1)]
+                const emote = this._client.emojis.cache.find(emoji => emoji.name === emoteString);
+                this._logger.info("Reacting to user message with emote", emote)
                 if(emote) {
                     await message.react(emote);
                 }
             }
-            if(!triggerOnCooldown || triggerValue.IgnoreCooldown){
+            if(triggerValue.Responses && triggerValue.Responses.length > 0 && (!triggerOnCooldown || triggerValue.IgnoreCooldown)){
                 if(triggerValue.SendRandomResponse){
                     returnMessage.push(triggerValue.Responses[this._helper.GetRandomNumber(0, triggerValue.Responses.length - 1)]);
                 } else {

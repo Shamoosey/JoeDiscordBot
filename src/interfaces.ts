@@ -12,21 +12,23 @@ export namespace Joebot{
         GetDadJoke():Promise<string>;
         GetRandomNumber(min:number, max:number):number;
         FilterNonValidUsers(): Promise<void>;
-        StringContains(str: string, contains:Array<string>, wholeWord?:boolean): boolean;
+        StringContains(str: string, contains:Array<string>, wholeWord?:boolean, excludeUrl?:boolean): boolean;
         GetRecentMessages(message:Message, count?: number):Promise<Collection<string, Message<boolean>>>;
         SendMessageToChannel(message:string, channelId?: string, ): Promise<string|undefined>;
+        StringIsUrl(str: string): boolean;
     }
 
     export interface Triggers {
+        DefaultResponses:Array<string>
         GetResponseFromString(message: string): Joebot.TriggerValue;
     }
 
     export interface TriggerValue {
         TriggerWords:Array<string>;
-        Responses: Array<string>;
+        Responses?: Array<string>;
         MessageDelete?: boolean;
         SendRandomResponse?: boolean;
         IgnoreCooldown?: boolean;
-        ReactEmote?: string;
+        ReactEmote?: Array<string>;
     }
 } 

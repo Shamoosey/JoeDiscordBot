@@ -35,11 +35,8 @@ export class Triggers implements Joebot.Triggers {
         [
             TriggerKeys.Joe, {
                 TriggerWords: ["joe", "joe biden", "biden"],
-                Responses: [
-                    "I'm Joe Biden and I approve this message.",
-                    "https://cdn.discordapp.com/attachments/942229872644870155/945402165365723146/Eyi1SNTXEAUvdWi.jpg"
-                ],
-                ReactEmote: "joeCD"
+                Responses: [],
+                ReactEmote: ["joeCD", "brandon"]
             }
         ],
         [
@@ -135,7 +132,7 @@ export class Triggers implements Joebot.Triggers {
                 Responses: [
                     "https://cdn.discordapp.com/attachments/306275893167521792/1042456167173079060/unknown.png"
                 ],
-                ReactEmote: "bingchillinCD"
+                ReactEmote: ["bingchillinCD"]
             }
         ],
         [ 
@@ -152,7 +149,7 @@ export class Triggers implements Joebot.Triggers {
                 Responses: [
                     "https://tenor.com/bFbhT.gif"
                 ],
-                ReactEmote: "GachiGasm"
+                ReactEmote: ["GachiGasm"]
             } 
         ],
         [
@@ -180,7 +177,7 @@ export class Triggers implements Joebot.Triggers {
                 Responses: [
                     "https://cdn.discordapp.com/attachments/942229872644870155/1054971360935428126/image.png"
                 ],
-                ReactEmote: "brandon"
+                ReactEmote: ["brandon"]
             }
         ],
         [
@@ -193,14 +190,17 @@ export class Triggers implements Joebot.Triggers {
         ]
     ])
 
+    public DefaultResponses:Array<string> = [
+        "I'm Joe Biden and I approve this message.",
+        "https://cdn.discordapp.com/attachments/942229872644870155/945402165365723146/Eyi1SNTXEAUvdWi.jpg"
+    ]
+
     GetResponseFromString(message: string): Joebot.TriggerValue {
         for( const [key, value] of this._triggers){
-            if(this._helper.StringContains(message, value.TriggerWords)){
+            if(this._helper.StringContains(message, value.TriggerWords, null, true)){
                 return value
             }
         }
         return undefined;
     }
-
-    CheckTriggerValid
 }

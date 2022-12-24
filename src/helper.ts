@@ -13,6 +13,7 @@ export class Helper implements Joebot.Helper {
     private kickerCacheEnabled = true;
     private readonly guild = "306275893167521792"
     private readonly defaultChannel = "306275893167521792";
+    private readonly urlRegex = "(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})";
     private noRoleMembers: Map<string, Date> = new Map<string, Date>();
 
     constructor(
@@ -44,15 +45,24 @@ export class Helper implements Joebot.Helper {
         return returnMessage;
     }
 
-    public StringContains(str: string, contains:Array<string>, wholeWord:boolean = true): boolean {
+    public StringIsUrl(str: string): boolean {
+        return new RegExp(this.urlRegex).test(str);
+    }
+
+    public StringContains(str: string, contains:Array<string>, wholeWord = true, excludeUrl = false): boolean {
         let match = false;
         str = str.toLowerCase();
         for(let word of contains) {
             let formattedWord = word.toLowerCase();
+
             if(wholeWord){
-                match = match || new RegExp('\\b' + formattedWord + '\\b', 'i').test(str);
+                let regexMatch = new RegExp('\\b' + formattedWord + '\\b', 'i').test(str);
+                let url = this.StringIsUrl(str);
+                match = match || ( excludeUrl ? regexMatch && !url : regexMatch)
             } else {
-                match = match || str.indexOf(formattedWord) >= 0
+                let stringContains = str.indexOf(formattedWord) >= 0;
+                let url = this.StringIsUrl(str);
+                match = match || ( excludeUrl ? stringContains && !url : stringContains)
             }
         }
 
