@@ -1,6 +1,6 @@
 import { Client, Message} from "discord.js";
 import {inject, injectable} from "inversify";
-import { Commands, TriggerKeys} from "./enums"
+import { Commands } from "./enums"
 import { CronJob } from 'cron';
 import jsonHelper from "./data/jsonHelper.json"
 import { Joebot } from "./interfaces";
@@ -13,7 +13,7 @@ export class Bot implements Joebot.Bot{
     private readonly _token: string;
     private _helper: Joebot.Helper;
     private _logger: Logger;
-    private _triggers: Joebot.Triggers
+    private _triggers: Joebot.Triggers.TriggerService
 
     private readonly secretIds = [ "281971257015009283", "177939550574739456" ]
 

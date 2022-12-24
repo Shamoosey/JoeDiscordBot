@@ -1,11 +1,11 @@
 import { Collection, Message } from "discord.js";
-import { TriggerKeys } from "./enums";
 
 export namespace Joebot{
 
     export interface Bot {
         Run(): Promise<void>
     }
+
     export interface Helper{
         SetStatus(message:string): Promise<string>;
         GetHelpMessage():string;
@@ -18,17 +18,21 @@ export namespace Joebot{
         StringIsUrl(str: string): boolean;
     }
 
-    export interface Triggers {
-        DefaultResponses:Array<string>
-        GetResponseFromString(message: string): Joebot.TriggerValue;
+    export namespace Triggers {
+
+        export interface TriggerService {
+            DefaultResponses:Array<string>
+            GetResponseFromString(message: string): TriggerValue;
+        }
+
+        export interface TriggerValue {
+            TriggerWords:Array<string>;
+            Responses?: Array<string>;
+            MessageDelete?: boolean;
+            SendRandomResponse?: boolean;
+            IgnoreCooldown?: boolean;
+            ReactEmote?: Array<string>;
+        }
     }
 
-    export interface TriggerValue {
-        TriggerWords:Array<string>;
-        Responses?: Array<string>;
-        MessageDelete?: boolean;
-        SendRandomResponse?: boolean;
-        IgnoreCooldown?: boolean;
-        ReactEmote?: Array<string>;
-    }
 } 
