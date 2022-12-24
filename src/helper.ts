@@ -25,7 +25,7 @@ export class Helper implements Joebot.Helper {
     }
 
     public async SetStatus(message:Joebot.StatusMessage):Promise<string> {
-        this._logger.info(`Changing status to "${message}"`)
+        this._logger.info("Changing bot status", message)
         let returnMsg = "CAN'T CHANGE MY STATUS IF YOU DONT TELL ME WHAT YOU WANT JACK!";
 
         if(message){
