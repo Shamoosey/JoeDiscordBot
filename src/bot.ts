@@ -112,7 +112,7 @@ export class Bot implements Joebot.Bot{
                     await message.react(emote);
                 }
             }
-            if(triggerValue.Responses && triggerValue.Responses.length > 0 && (!triggerOnCooldown || triggerValue.IgnoreCooldown)){
+            if(process.env.NODE_ENV == "dev"  || (triggerValue.Responses && triggerValue.Responses.length > 0 && (!triggerOnCooldown || triggerValue.IgnoreCooldown))){
                 if(triggerValue.SendRandomResponse){
                     returnMessage.push(triggerValue.Responses[this._helper.GetRandomNumber(0, triggerValue.Responses.length - 1)]);
                 } else {
