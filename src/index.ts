@@ -7,6 +7,10 @@ const logger = container.get<Logger>("Logger");
 
 logger.info("** Application Startup **")
 
+process.on("uncaughtException", (error) => {
+    logger.error("*** Unhandled Error ***", error);
+})
+
 let bot = container.get<Bot>("Bot");
 
 bot.Run();

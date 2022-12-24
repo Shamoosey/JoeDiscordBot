@@ -1,4 +1,4 @@
-import { Client, Collection, GuildMember, Message, TextChannel } from "discord.js";
+import { ActivityType, Client, Collection, GuildMember, Message, TextChannel } from "discord.js";
 import {inject, injectable} from "inversify";
 import {Commands, ActivityTypes} from "./enums"
 import {Joebot} from "./interfaces"
@@ -24,11 +24,15 @@ export class Helper implements Joebot.Helper {
         this._logger = logger;
     }
 
-    public async SetStatus(message:string):Promise<string> {
+    public async SetStatus(message:Joebot.StatusMessage):Promise<string> {
         this._logger.info(`Changing status to "${message}"`)
         let returnMsg = "CAN'T CHANGE MY STATUS IF YOU DONT TELL ME WHAT YOU WANT JACK!";
-        if(message != ""){
-            await this._client.user.setActivity(message, {type: ActivityTypes.PLAYING})
+
+        if(message){
+            if(!message.Type || message.Type == undefined){
+                message.Type = ActivityType.Playing
+            }
+            await this._client.user.setActivity(message.Status, { type: message.Type as any, })
             returnMsg = `Status changed to: ${message}`;
         }
         return returnMsg
@@ -150,7 +154,7 @@ export class Helper implements Joebot.Helper {
     public async GetRecentMessages(message:Message, count: number = 20): Promise<Collection<string, Message<boolean>>> {
         this._logger.info(`Checking last ${count} messages in channel`, message.channel);
         let channel = await message.channel.fetch();
-        let channelMessages = await channel.messages.fetch({limit: count}, {cache: false});
+        let channelMessages = await channel.messages.fetch({limit: count, cache: false});
         return channelMessages;
     }
     

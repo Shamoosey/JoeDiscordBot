@@ -1,11 +1,12 @@
-import { Client, Message} from "discord.js";
+import { Client, Message } from "discord.js";
 import {inject, injectable} from "inversify";
 import { Commands } from "./enums"
 import { CronJob } from 'cron';
-import jsonHelper from "./data/jsonHelper.json"
+import HelpMessages from "./data/HelpMessages.json"
 import { Joebot } from "./interfaces";
-import { Logger } from "winston";
-import { Triggers } from "./Triggers";
+import { ExceptionHandler, Logger } from "winston";
+import { Triggers } from "./Triggers"; 
+import StatusMessages from "./data/StatusMessages.json"
 
 @injectable()
 export class Bot implements Joebot.Bot{
@@ -14,6 +15,7 @@ export class Bot implements Joebot.Bot{
     private _helper: Joebot.Helper;
     private _logger: Logger;
     private _triggers: Joebot.Triggers.TriggerService
+    private _statusMessages: Array<Joebot.StatusMessage>
 
     private readonly secretIds = [ "281971257015009283", "177939550574739456" ]
 
@@ -27,8 +29,10 @@ export class Bot implements Joebot.Bot{
         this._client = client;
         this._token = token;
         this._helper = helper;
-        this._logger = logger;
+        this._logger = logger; 
         this._triggers = Triggers;
+
+        this._statusMessages = StatusMessages as Array<Joebot.StatusMessage>;
     }
 
     public async Run(): Promise<void> {
@@ -47,7 +51,7 @@ export class Bot implements Joebot.Bot{
 
         new CronJob('30 * * * *', async () => {
             try {
-                await this._helper.SetStatus(jsonHelper.status[this._helper.GetRandomNumber(0, jsonHelper.status.length - 1)])
+                await this._helper.SetStatus(this._statusMessages[this._helper.GetRandomNumber(0, this._statusMessages.length - 1)])
             } catch (e) {
                 this._logger.error("Error occured while setting the status", e)
             }
@@ -60,7 +64,6 @@ export class Bot implements Joebot.Bot{
                 this._logger.error("Error occured while checking for non-valid users", e)
             }
         }, undefined, true, "America/Winnipeg", undefined, true);
-
     }
 
     private async onMessage(message:Message): Promise<void>{
@@ -104,8 +107,8 @@ export class Bot implements Joebot.Bot{
             if(triggerValue.ReactEmote && triggerValue.ReactEmote.length > 0 && !triggerValue.MessageDelete){
                 let emoteString = triggerValue.ReactEmote[this._helper.GetRandomNumber(0, triggerValue.ReactEmote.length - 1)]
                 const emote = this._client.emojis.cache.find(emoji => emoji.name === emoteString);
-                this._logger.info("Reacting to user message with emote", emote)
                 if(emote) {
+                    this._logger.info("Reacting to user message with emote", emote)
                     await message.react(emote);
                 }
             }
@@ -143,7 +146,7 @@ export class Bot implements Joebot.Bot{
         } else {
             switch(command){
                 case Commands.Status:
-                    returnMessage.push(await this._helper.SetStatus(messageArgs));
+                    returnMessage.push(await this._helper.SetStatus({Status: messageArgs}));
                     break;
                 case Commands.Help:
                     returnMessage.push(this._helper.GetHelpMessage())
@@ -164,7 +167,7 @@ export class Bot implements Joebot.Bot{
                     }
                     break;
                 default: 
-                    returnMessage.push(jsonHelper.helpMessages[this._helper.GetRandomNumber(0, jsonHelper.helpMessages.length - 1)].replace("${help}", `${process.env.PREFIX}help`))
+                    returnMessage.push(HelpMessages[this._helper.GetRandomNumber(0, HelpMessages.length - 1)].replace("${help}", `${process.env.PREFIX}help`))
                     break;
             }
         }

@@ -1,4 +1,4 @@
-import { Collection, Message } from "discord.js";
+import { ActivityType, Collection, Message } from "discord.js";
 
 export namespace Joebot{
 
@@ -7,7 +7,7 @@ export namespace Joebot{
     }
 
     export interface Helper{
-        SetStatus(message:string): Promise<string>;
+        SetStatus(message:Joebot.StatusMessage): Promise<string>;
         GetHelpMessage():string;
         GetDadJoke():Promise<string>;
         GetRandomNumber(min:number, max:number):number;
@@ -33,6 +33,11 @@ export namespace Joebot{
             IgnoreCooldown?: boolean;
             ReactEmote?: Array<string>;
         }
+    }
+
+    export interface StatusMessage {
+        Status: string;
+        Type?: ActivityType;
     }
 
 } 
