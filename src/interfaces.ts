@@ -18,11 +18,13 @@ export namespace Joebot{
         StringIsUrl(str: string): boolean;
     }
 
-    export namespace Triggers {
+    export namespace Configuration {
+
+        // export 
 
         export interface TriggerService {
             DefaultResponses:Array<string>
-            GetResponseFromString(message: string): TriggerValue;
+            CheckTriggers(message:Message): Promise<Array<string>>;
         }
 
         export interface TriggerValue {

@@ -1,5 +1,5 @@
 require('dotenv').config();
-import container from "./dependencyInjection";
+import container from "./dependency-injection";
 import { Bot } from "./bot";
 import { Logger } from "winston";
 

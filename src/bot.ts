@@ -4,8 +4,7 @@ import { Commands } from "./enums"
 import { CronJob } from 'cron';
 import HelpMessages from "./data/HelpMessages.json"
 import { Joebot } from "./interfaces";
-import { ExceptionHandler, Logger } from "winston";
-import { Triggers } from "./Triggers"; 
+import { Logger } from "winston";
 import StatusMessages from "./data/StatusMessages.json"
 
 @injectable()
@@ -14,7 +13,7 @@ export class Bot implements Joebot.Bot{
     private readonly _token: string;
     private _helper: Joebot.Helper;
     private _logger: Logger;
-    private _triggers: Joebot.Triggers.TriggerService
+    private _triggerService: Joebot.Configuration.TriggerService
     private _statusMessages: Array<Joebot.StatusMessage>
 
     private readonly secretIds = [ "281971257015009283", "177939550574739456" ]
@@ -24,13 +23,13 @@ export class Bot implements Joebot.Bot{
         @inject("Token") token: string,
         @inject("Helper") helper: Joebot.Helper,
         @inject("Logger") logger: Logger,
-        @inject("Triggers") Triggers: Triggers
+        @inject("Triggers") triggerService: Joebot.Configuration.TriggerService
     ) {
         this._client = client;
         this._token = token;
         this._helper = helper;
         this._logger = logger; 
-        this._triggers = Triggers;
+        this._triggerService = triggerService;
 
         this._statusMessages = StatusMessages as Array<Joebot.StatusMessage>;
     }
@@ -70,13 +69,13 @@ export class Bot implements Joebot.Bot{
         if(!message.author.bot){
             let returnMessage = new Array<string>();
             if(message.mentions.has(this._client.user.id)){
-                returnMessage = this._triggers.DefaultResponses;
+                returnMessage = this._triggerService.DefaultResponses;
             } else {
                 if(message.content.startsWith(process.env.PREFIX)){
                     this._logger.info(`Incomming command "${message.content}" from ${message.author.username}`)
                     returnMessage = await this.checkCommands(message);
                 } else {
-                    returnMessage = await this.checkTriggers(message);
+                    returnMessage = await this._triggerService.CheckTriggers(message);
                 }
             }
 
@@ -87,44 +86,6 @@ export class Bot implements Joebot.Bot{
                 }
             }
         }
-    }
-
-    private async checkTriggers(message:Message): Promise<Array<string>> {
-        let returnMessage = new Array<string>();
-        let triggerValue = this._triggers.GetResponseFromString(message.content);
-        if(triggerValue) {
-            this._logger.info(`Found trigger in message ${message.content}`, triggerValue);
-            let triggerOnCooldown = false;
-            let recentMessages = await this._helper.GetRecentMessages(message);
-            for( const [key, value] of recentMessages){
-                if(value.author.id == this._client.user.id){
-                    if(triggerValue.Responses.includes(value.content)){
-                        triggerOnCooldown = true;
-                        break;
-                    }
-                }
-            }
-            if(triggerValue.ReactEmote && triggerValue.ReactEmote.length > 0 && !triggerValue.MessageDelete){
-                let emoteString = triggerValue.ReactEmote[this._helper.GetRandomNumber(0, triggerValue.ReactEmote.length - 1)]
-                const emote = this._client.emojis.cache.find(emoji => emoji.name === emoteString);
-                if(emote) {
-                    this._logger.info("Reacting to user message with emote", emote)
-                    await message.react(emote);
-                }
-            }
-            if(process.env.NODE_ENV == "dev"  || (triggerValue.Responses && triggerValue.Responses.length > 0 && (!triggerOnCooldown || triggerValue.IgnoreCooldown))){
-                if(triggerValue.SendRandomResponse){
-                    returnMessage.push(triggerValue.Responses[this._helper.GetRandomNumber(0, triggerValue.Responses.length - 1)]);
-                } else {
-                    returnMessage = triggerValue.Responses;
-                }
-
-                if(triggerValue.MessageDelete && message.guild !== null){
-                    await message.delete();
-                }
-            }
-        }
-        return returnMessage;
     }
 
     private async checkCommands(message:Message): Promise<Array<string>> {

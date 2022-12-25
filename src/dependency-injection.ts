@@ -5,7 +5,7 @@ import { Client, Partials } from "discord.js";
 import { Helper } from "./helper";
 import { Logger } from "winston";
 import { LogFactory } from "./logFactory";
-import { Triggers } from "./Triggers";
+import { Triggers } from "./trigger-service";
 import { Joebot } from "./interfaces";
 
 let container = new Container();
