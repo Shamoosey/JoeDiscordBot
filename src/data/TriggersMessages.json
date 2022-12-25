@@ -195,5 +195,14 @@
         "Responses": [
             "https://i.imgur.com/S3JoQbh.jpg"
         ]
+    },
+    {
+        "TriggerWords": [
+            "usd", 
+            "money"
+        ],
+        "Responses": [
+            "https://cdn.discordapp.com/attachments/943383367339110511/1056462694414290984/joe-biden-found-two-quarters-580c2d0d39c5a.jpeg"
+        ]
     }
 ]
