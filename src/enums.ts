@@ -1,3 +1,4 @@
+
 export enum Commands {
     Status = "status",
     Help = "help",
@@ -6,10 +7,11 @@ export enum Commands {
     Suggestion = "suggestion"
 }
 
-export enum ActivityTypes {
-    PLAYING = "PLAYING",
-    STREAMING = "STREAMING",
-    LISTENING = "LISTENING",
-    WATCHING = "WATCHING",
-    COMPETING = "COMPETING"
+export const Symbols = {
+	Bot: Symbol.for("Bot"),
+	Helper: Symbol.for("Helper"),
+	Logger: Symbol.for("Logger"),
+	Client: Symbol.for("Client"),
+    ConfigService: Symbol.for("ConfigService"),
+    KickCacheService: Symbol.for("KickCacheService")
 }

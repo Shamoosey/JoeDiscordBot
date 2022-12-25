@@ -3,3 +3,4 @@ build
 .env
 logs
 *.log
+joebot-firebase-cert.json

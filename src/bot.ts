@@ -1,6 +1,6 @@
 import { Client, Message } from "discord.js";
 import {inject, injectable} from "inversify";
-import { Commands } from "./enums"
+import { Commands, Symbols } from "./enums"
 import { CronJob } from 'cron';
 import HelpMessages from "./data/HelpMessages.json"
 import { Joebot } from "./interfaces";
@@ -10,32 +10,32 @@ import StatusMessages from "./data/StatusMessages.json"
 @injectable()
 export class Bot implements Joebot.Bot{
     private _client: Client;
-    private readonly _token: string;
     private _helper: Joebot.Helper;
     private _logger: Logger;
-    private _triggerService: Joebot.Configuration.TriggerService
+    private _configService: Joebot.Configuration.ConfigurationService
     private _statusMessages: Array<Joebot.StatusMessage>
+    private _kickCacheService: Joebot.KickCacheService;
 
     private readonly secretIds = [ "281971257015009283", "177939550574739456" ]
 
     constructor(
-        @inject("Client") client: Client,
-        @inject("Token") token: string,
-        @inject("Helper") helper: Joebot.Helper,
-        @inject("Logger") logger: Logger,
-        @inject("Triggers") triggerService: Joebot.Configuration.TriggerService
+        @inject(Symbols.Client) client: Client,
+        @inject(Symbols.Helper) helper: Joebot.Helper,
+        @inject(Symbols.Logger) logger: Logger,
+        @inject(Symbols.ConfigService) configService: Joebot.Configuration.ConfigurationService,
+        @inject(Symbols.KickCacheService) kickCacheService: Joebot.KickCacheService
     ) {
         this._client = client;
-        this._token = token;
         this._helper = helper;
         this._logger = logger; 
-        this._triggerService = triggerService;
+        this._configService = configService;
+        this._kickCacheService = kickCacheService
 
         this._statusMessages = StatusMessages as Array<Joebot.StatusMessage>;
     }
 
     public async Run(): Promise<void> {
-        await this._client.login(this._token)
+        await this._client.login(process.env.JOE_TOKEN)
         if(this._client.isReady) {
             await this.Initalize();
         } else {
@@ -46,6 +46,7 @@ export class Bot implements Joebot.Bot{
     }
 
     private async Initalize():Promise<void> {
+        this._configService.InitializeAppConfigurations();
         this._client.on('messageCreate', async (message: Message) => await this.onMessage(message));
 
         new CronJob('30 * * * *', async () => {
@@ -58,7 +59,7 @@ export class Bot implements Joebot.Bot{
 
         new CronJob('0 0 */1 * * *', async () => {
             try{
-                await this._helper.FilterNonValidUsers();
+                await this._kickCacheService.FilterNonValidUsers();
             } catch (e){
                 this._logger.error("Error occured while checking for non-valid users", e)
             }
@@ -69,13 +70,13 @@ export class Bot implements Joebot.Bot{
         if(!message.author.bot){
             let returnMessage = new Array<string>();
             if(message.mentions.has(this._client.user.id)){
-                returnMessage = this._triggerService.DefaultResponses;
+                returnMessage = this._configService.DefaultResponses;
             } else {
                 if(message.content.startsWith(process.env.PREFIX)){
                     this._logger.info(`Incomming command "${message.content}" from ${message.author.username}`)
                     returnMessage = await this.checkCommands(message);
                 } else {
-                    returnMessage = await this._triggerService.CheckTriggers(message);
+                    returnMessage = await this._configService.CheckTriggers(message);
                 }
             }
 

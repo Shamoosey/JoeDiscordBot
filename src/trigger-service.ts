@@ -1,33 +1,35 @@
 import { inject, injectable } from "inversify";
 import { Joebot } from "./interfaces";
 import TriggerMessages from "./data/TriggersMessages.json"
-import { initializeApp} from 'firebase-admin/app';
-
+import { initializeApp, applicationDefault, cert } from "firebase-admin/app"
+import { getFirestore, Timestamp, FieldValue } from "firebase-admin/firestore"
 import { Client, Message } from "discord.js";
 import { Logger } from "winston";
-import { App } from "firebase-admin/lib/app/core";
+import { Symbols } from "./enums";
 
 @injectable()
-export class TriggerService implements Joebot.Configuration.TriggerService {
+export class ConfigurationService implements Joebot.Configuration.ConfigurationService {
     private _helper: Joebot.Helper;
     private _client: Client;
     private _logger: Logger;
-    private _firebaseApp: App;
+    private _db: FirebaseFirestore.Firestore;
 
-    private _triggersValues: Array<Joebot.Configuration.TriggerValue>;
+    private _configurations: Array<Joebot.Configuration.AppConfig>;
 
-
+    private _triggersValues: Array<Joebot.Configuration.Trigger>;
 
     
     public readonly DefaultResponses:Array<string> = [
         "I'm Joe Biden and I approve this message.",
         "https://cdn.discordapp.com/attachments/942229872644870155/945402165365723146/Eyi1SNTXEAUvdWi.jpg"
     ]
+
+    public DefaultChannel: string = ""
     
     constructor (
-        @inject("Client") client: Client,
-        @inject("Helper") helper: Joebot.Helper,
-        @inject("Logger") logger: Logger
+        @inject(Symbols.Client) client: Client,
+        @inject(Symbols.Helper) helper: Joebot.Helper,
+        @inject(Symbols.Logger) logger: Logger
     ) {
         this._helper = helper
         this._client = client;
@@ -35,14 +37,27 @@ export class TriggerService implements Joebot.Configuration.TriggerService {
 
         this._triggersValues = TriggerMessages;
 
-        this._firebaseApp = initializeApp({});
-        
+        const serviceAccount = require('../joebot-firebase-cert.json');
+
+        const app = initializeApp({
+            credential: cert(serviceAccount)
+        });
+
+        this._db = getFirestore();
     }
 
-    private async GetConfiguration(): Promise<any> {
+    public async InitializeAppConfigurations(): Promise<void> {
+        let appConfigs = new Array<Joebot.Configuration.AppConfig>();
+        const firebaseConfigs = await this._db.collection('/JoebotConfigurations').get()
+        firebaseConfigs.forEach((doc) => {
+            console.log(doc.id, '=>', doc.data());
+        });
+
+        this._configurations = appConfigs;
+    }
 
 
-    private getResponseFromString(message: string): Joebot.Configuration.TriggerValue {
+    getResponseFromString(message: string): Joebot.Configuration.Trigger {
         for( const value of this._triggersValues){
             if(this._helper.StringContains(message, value.TriggerWords, null, true)){
                 return value

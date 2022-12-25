@@ -1,9 +1,9 @@
-import { ActivityType, Collection, Message } from "discord.js";
+import { ActivityType, Collection, GuildMember, Message } from "discord.js";
 
 export namespace Joebot{
 
     export interface Bot {
-        Run(): Promise<void>
+        Run(): Promise<void>;
     }
 
     export interface Helper{
@@ -11,23 +11,40 @@ export namespace Joebot{
         GetHelpMessage():string;
         GetDadJoke():Promise<string>;
         GetRandomNumber(min:number, max:number):number;
-        FilterNonValidUsers(): Promise<void>;
         StringContains(str: string, contains:Array<string>, wholeWord?:boolean, excludeUrl?:boolean): boolean;
         GetRecentMessages(message:Message, count?: number):Promise<Collection<string, Message<boolean>>>;
         SendMessageToChannel(message:string, channelId?: string, ): Promise<string|undefined>;
         StringIsUrl(str: string): boolean;
+        FetchGuildMembers(guild:string): Promise<GuildMember[]>
+    }
+
+    export interface KickCacheService {
+        FilterNonValidUsers(): Promise<void>;
+    }
+
+    export interface CachedUser {
+        userId: string;
+        cachedDate: Date;
     }
 
     export namespace Configuration {
 
-        // export 
+        export interface AppConfig {
+            GuildId: string;
+            StatusMessages: Array<StatusMessage>;
+            Triggers: Array<Trigger>;
+            SecretUsers: Array<string>;
+            EnableKickerCache: boolean;
+            DefaultChannel: string;
+        }
 
-        export interface TriggerService {
-            DefaultResponses:Array<string>
+        export interface ConfigurationService {
+            DefaultResponses:Array<string>;
+            InitializeAppConfigurations(): Promise<void>;
             CheckTriggers(message:Message): Promise<Array<string>>;
         }
 
-        export interface TriggerValue {
+        export interface Trigger {
             TriggerWords:Array<string>;
             Responses?: Array<string>;
             MessageDelete?: boolean;
