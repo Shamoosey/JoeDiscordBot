@@ -1,6 +1,5 @@
 import { inject, injectable } from "inversify";
 import { Joebot } from "./interfaces";
-import TriggerMessages from "./data/TriggersMessages.json"
 import { initializeApp, applicationDefault, cert } from "firebase-admin/app"
 import { getFirestore, Timestamp, FieldValue } from "firebase-admin/firestore"
 import { Client, Message } from "discord.js";
@@ -16,16 +15,11 @@ export class ConfigurationService implements Joebot.Configuration.ConfigurationS
 
     private _configurations: Array<Joebot.Configuration.AppConfig>;
 
-    private _triggersValues: Array<Joebot.Configuration.Trigger>;
-
-    
     public readonly DefaultResponses:Array<string> = [
         "I'm Joe Biden and I approve this message.",
         "https://cdn.discordapp.com/attachments/942229872644870155/945402165365723146/Eyi1SNTXEAUvdWi.jpg"
     ]
 
-    public DefaultChannel: string = ""
-    
     constructor (
         @inject(Symbols.Client) client: Client,
         @inject(Symbols.Helper) helper: Joebot.Helper,
@@ -34,41 +28,66 @@ export class ConfigurationService implements Joebot.Configuration.ConfigurationS
         this._helper = helper
         this._client = client;
         this._logger = logger;
-
-        this._triggersValues = TriggerMessages;
+        this._configurations = new Array<Joebot.Configuration.AppConfig>();
 
         const serviceAccount = require('../joebot-firebase-cert.json');
 
-        const app = initializeApp({
+        initializeApp({
             credential: cert(serviceAccount)
         });
-
         this._db = getFirestore();
     }
 
     public async InitializeAppConfigurations(): Promise<void> {
         let appConfigs = new Array<Joebot.Configuration.AppConfig>();
         const firebaseConfigs = await this._db.collection('/JoebotConfigurations').get()
-        firebaseConfigs.forEach((doc) => {
-            console.log(doc.id, '=>', doc.data());
+
+        firebaseConfigs.forEach(async (item) => {
+            const triggersConfigs = await this._db.collection(`/JoebotConfigurations/${item.id}/Triggers`).get();
+            const statusMessagesConfigs = await this._db.collection(`/JoebotConfigurations/${item.id}/StatusMessages`).get();
+
+            let statusMessages = new Array<Joebot.StatusMessage>();
+            statusMessagesConfigs.forEach((item) => {
+                statusMessages.push({
+                    Status: item.data().Status,
+                    Type: item.data().Type == undefined ? 0 : item.data().Type 
+                })
+            })
+
+            let triggers = new Array<Joebot.Configuration.Trigger>();
+            triggersConfigs.forEach((item) => {
+                triggers.push({
+                    TriggerWords: item.data().TriggerWords,
+                    IgnoreCooldown: item.data().IgnoreCooldown,
+                    MessageDelete: item.data().MessageDelete,
+                    ReactEmote: item.data().ReactEmote,
+                    Responses: item.data().Responses,
+                    SendRandomResponse: item.data().SendRandonResponse
+                })
+            })
+
+            let configurationItem: Joebot.Configuration.AppConfig = {
+                GuildId: item.id,
+                DefaultChannel: item.data().DefaultChannel,
+                EnableKickerCache: item.data().EnableKickerCache,
+                SecretUsers: item.data().SecretUsers,
+                StatusMessages: statusMessages,
+                Triggers: triggers
+            }
+            this._configurations.push(configurationItem)
         });
 
         this._configurations = appConfigs;
     }
 
 
-    getResponseFromString(message: string): Joebot.Configuration.Trigger {
-        for( const value of this._triggersValues){
-            if(this._helper.StringContains(message, value.TriggerWords, null, true)){
-                return value
-            }
-        }
-        return undefined;
+    public GetConfigurationForGuild(guildId: string): Joebot.Configuration.AppConfig | undefined {
+        return this._configurations.find(x => x.GuildId == guildId);
     }
 
     public async CheckTriggers(message:Message): Promise<Array<string>> {
         let returnMessage = new Array<string>();
-        let triggerValue = this.getResponseFromString(message.content);
+        let triggerValue = this.getResponseFromString(message.guild.id, message.content);
         if(triggerValue) {
             this._logger.info(`Found trigger in message ${message.content}`, triggerValue);
             let triggerOnCooldown = false;
@@ -102,5 +121,15 @@ export class ConfigurationService implements Joebot.Configuration.ConfigurationS
             }
         }
         return returnMessage;
+    }
+
+    private getResponseFromString(guild: string, message: string): Joebot.Configuration.Trigger {
+        const config = this.GetConfigurationForGuild(guild);
+        for( const value of config.Triggers){
+            if(this._helper.StringContains(message, value.TriggerWords, null, true)){
+                return value
+            }
+        }
+        return undefined;
     }
 }

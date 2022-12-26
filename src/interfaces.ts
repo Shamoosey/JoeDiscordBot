@@ -41,6 +41,7 @@ export namespace Joebot{
         export interface ConfigurationService {
             DefaultResponses:Array<string>;
             InitializeAppConfigurations(): Promise<void>;
+            GetConfigurationForGuild(guildId: string): Joebot.Configuration.AppConfig | undefined;
             CheckTriggers(message:Message): Promise<Array<string>>;
         }
 

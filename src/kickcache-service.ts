@@ -1,8 +1,5 @@
 import { inject, injectable } from "inversify";
 import { Joebot } from "./interfaces";
-import TriggerMessages from "./data/TriggersMessages.json"
-import { initializeApp, applicationDefault, cert } from "firebase-admin/app"
-import { getFirestore, Timestamp, FieldValue } from "firebase-admin/firestore"
 import { Client, Message, TextChannel } from "discord.js";
 import { Logger } from "winston";
 import { Symbols } from "./enums";
@@ -32,8 +29,8 @@ export class KickCacheService implements Joebot.KickCacheService {
         this._logger.info("Checking for non-valid users to add to cache");
 
         //Update these to user trigger service once implemented
-        let guildId = ""
         let defaultChannel = ""
+        let guildId = ""
 
         await this.updateCachedMembers(guildId);
         let kickedUsersMessage = ""

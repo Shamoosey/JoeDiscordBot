@@ -5,7 +5,6 @@ import { CronJob } from 'cron';
 import HelpMessages from "./data/HelpMessages.json"
 import { Joebot } from "./interfaces";
 import { Logger } from "winston";
-import StatusMessages from "./data/StatusMessages.json"
 
 @injectable()
 export class Bot implements Joebot.Bot{
@@ -13,10 +12,8 @@ export class Bot implements Joebot.Bot{
     private _helper: Joebot.Helper;
     private _logger: Logger;
     private _configService: Joebot.Configuration.ConfigurationService
-    private _statusMessages: Array<Joebot.StatusMessage>
+    private _statusMessages: Array<Joebot.StatusMessage>;
     private _kickCacheService: Joebot.KickCacheService;
-
-    private readonly secretIds = [ "281971257015009283", "177939550574739456" ]
 
     constructor(
         @inject(Symbols.Client) client: Client,
@@ -30,8 +27,6 @@ export class Bot implements Joebot.Bot{
         this._logger = logger; 
         this._configService = configService;
         this._kickCacheService = kickCacheService
-
-        this._statusMessages = StatusMessages as Array<Joebot.StatusMessage>;
     }
 
     public async Run(): Promise<void> {
@@ -47,6 +42,8 @@ export class Bot implements Joebot.Bot{
 
     private async Initalize():Promise<void> {
         this._configService.InitializeAppConfigurations();
+
+
         this._client.on('messageCreate', async (message: Message) => await this.onMessage(message));
 
         new CronJob('30 * * * *', async () => {
@@ -94,8 +91,18 @@ export class Bot implements Joebot.Bot{
         let formattedMessage:string = message.content.substring(1);
         let command = formattedMessage.split(" ")[0].toLowerCase();
         let messageArgs = formattedMessage.substring(command.length + 1)
+        let configuration: Joebot.Configuration.AppConfig | undefined;
+        let secretUsers = new Array<string>();
 
-        if(this.secretIds.includes(message.author.id) && message.guild == null && command == "send"){
+        if(message.guild){
+            configuration = this._configService.GetConfigurationForGuild(message.guild.id);
+        }
+
+        if(configuration?.SecretUsers){
+            secretUsers = configuration.SecretUsers
+        }
+
+        if(secretUsers.includes(message.author.id) && message.guild == null && command == "send"){
             let cmdArgs = messageArgs.split(";;");
             if(cmdArgs.length > 0){
                 let messageToSend= cmdArgs.length == 1 ? cmdArgs[0] : cmdArgs[1];
