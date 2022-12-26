@@ -5,8 +5,10 @@ import { Client, GatewayIntentBits, Partials } from "discord.js";
 import { Helper } from "./helper";
 import { Logger } from "winston";
 import { LogFactory } from "./logFactory";
-import { Triggers } from "./Triggers";
+import { ConfigurationService } from "./configuration-service";
 import { Joebot } from "./interfaces";
+import { Symbols } from "./enums";
+import { KickCacheService } from "./kickcache-service";
 
 const container = new Container();
 
@@ -16,6 +18,7 @@ const client = new Client({
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildBans,
         GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildMembers,
         GatewayIntentBits.MessageContent
     ], 
     partials: [
@@ -25,11 +28,10 @@ const client = new Client({
     ] 
 });
 
-container.bind<Joebot.Bot>("Bot").to(Bot).inSingletonScope();
-container.bind<Client>("Client").toConstantValue(client);
-container.bind<string>("Token").toConstantValue(process.env.JOE_TOKEN);
-container.bind<Joebot.Helper>("Helper").to(Helper).inSingletonScope();
-container.bind<Logger>("Logger").toConstantValue(LogFactory.GetNewLogger());
-container.bind<Joebot.Triggers.TriggerService>("Triggers").to(Triggers).inSingletonScope();
-
+container.bind<Joebot.Bot>(Symbols.Bot).to(Bot).inSingletonScope();
+container.bind<Client>(Symbols.Client).toConstantValue(client);
+container.bind<Joebot.Helper>(Symbols.Helper).to(Helper).inSingletonScope();
+container.bind<Logger>(Symbols.Logger).toConstantValue(LogFactory.GetNewLogger());
+container.bind<Joebot.Configuration.ConfigurationService>(Symbols.ConfigService).to(ConfigurationService).inSingletonScope();
+container.bind<Joebot.KickCache.KickCacheService>(Symbols.KickCacheService).to(KickCacheService).inSingletonScope();
 export default container;
