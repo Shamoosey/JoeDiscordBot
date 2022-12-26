@@ -12,15 +12,14 @@ export class Bot implements Joebot.Bot{
     private _helper: Joebot.Helper;
     private _logger: Logger;
     private _configService: Joebot.Configuration.ConfigurationService
-    private _statusMessages: Array<Joebot.StatusMessage>;
-    private _kickCacheService: Joebot.KickCacheService;
+    private _kickCacheService: Joebot.KickCache.KickCacheService;
 
     constructor(
         @inject(Symbols.Client) client: Client,
         @inject(Symbols.Helper) helper: Joebot.Helper,
         @inject(Symbols.Logger) logger: Logger,
         @inject(Symbols.ConfigService) configService: Joebot.Configuration.ConfigurationService,
-        @inject(Symbols.KickCacheService) kickCacheService: Joebot.KickCacheService
+        @inject(Symbols.KickCacheService) kickCacheService: Joebot.KickCache.KickCacheService
     ) {
         this._client = client;
         this._helper = helper;
@@ -41,22 +40,28 @@ export class Bot implements Joebot.Bot{
     }
 
     private async Initalize():Promise<void> {
-        this._configService.InitializeAppConfigurations();
-
+        let guilds = this._client.guilds.cache.map(x => x.id);
+        await this._configService.InitializeAppConfigurations(guilds);
 
         this._client.on('messageCreate', async (message: Message) => await this.onMessage(message));
 
         new CronJob('30 * * * *', async () => {
             try {
-                await this._helper.SetStatus(this._statusMessages[this._helper.GetRandomNumber(0, this._statusMessages.length - 1)])
+                await this._helper.SetStatus(this._configService.StatusMessages[this._helper.GetRandomNumber(0, this._configService.StatusMessages.length - 1)])
             } catch (e) {
                 this._logger.error("Error occured while setting the status", e)
             }
         }, undefined, true, "America/Winnipeg", undefined, true);
 
-        new CronJob('0 0 */1 * * *', async () => {
+        // new CronJob('0 0 */1 * * *', async () => {
+        new CronJob('0 * * * * *', async () => {
             try{
-                await this._kickCacheService.FilterNonValidUsers();
+                let configs = this._configService.GetAllConfigurations();
+                for(let configItem of configs){
+                    if(configItem.KickerCacheConfig.EnableKickerCache){
+                        await this._kickCacheService.FilterNonValidUsers(configItem);
+                    }
+                }
             } catch (e){
                 this._logger.error("Error occured while checking for non-valid users", e)
             }
@@ -140,7 +145,6 @@ export class Bot implements Joebot.Bot{
                     break;
             }
         }
-
 
         return returnMessage;
     }

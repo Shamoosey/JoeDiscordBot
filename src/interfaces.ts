@@ -1,4 +1,4 @@
-import { ActivityType, Collection, GuildMember, Message } from "discord.js";
+import { ActivityType, Collection, Guild, GuildMember, Message } from "discord.js";
 
 export namespace Joebot{
 
@@ -18,29 +18,40 @@ export namespace Joebot{
         FetchGuildMembers(guild:string): Promise<GuildMember[]>
     }
 
-    export interface KickCacheService {
-        FilterNonValidUsers(): Promise<void>;
-    }
-
-    export interface CachedUser {
-        userId: string;
-        cachedDate: Date;
+    export namespace KickCache{
+        export interface KickCacheService {
+            FilterNonValidUsers(configuration: Joebot.Configuration.AppConfig): Promise<void>;
+        }
+        export interface CachedUser {
+            userId: string;
+            cachedDate: Date;
+        }
+        
+        export interface KickCacheConfig{
+            EnableKickerCache: boolean;
+            KickCacheDays: number;
+            KickCacheHours: number;
+            KickServerMessage: string;
+            KickedUserMessage: string;
+        }
     }
 
     export namespace Configuration {
 
         export interface AppConfig {
             GuildId: string;
-            StatusMessages: Array<StatusMessage>;
             Triggers: Array<Trigger>;
             SecretUsers: Array<string>;
-            EnableKickerCache: boolean;
+            KickerCacheConfig: KickCache.KickCacheConfig;
             DefaultChannel: string;
         }
-
+        
         export interface ConfigurationService {
             DefaultResponses:Array<string>;
-            InitializeAppConfigurations(): Promise<void>;
+            StatusMessages: Array<StatusMessage>;
+            TestMode: boolean;
+            InitializeAppConfigurations(guilds:Array<string>): Promise<void>;
+            GetAllConfigurations():Array<Joebot.Configuration.AppConfig>
             GetConfigurationForGuild(guildId: string): Joebot.Configuration.AppConfig | undefined;
             CheckTriggers(message:Message): Promise<Array<string>>;
         }

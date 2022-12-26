@@ -1,73 +1,70 @@
 import { inject, injectable } from "inversify";
 import { Joebot } from "./interfaces";
-import { Client, Message, TextChannel } from "discord.js";
+import { Client, Guild, Message, TextChannel } from "discord.js";
 import { Logger } from "winston";
 import { Symbols } from "./enums";
 
 @injectable()
-export class KickCacheService implements Joebot.KickCacheService {
+export class KickCacheService implements Joebot.KickCache.KickCacheService {
     private _helper: Joebot.Helper;
     private _client: Client;
     private _logger: Logger;
-    private _configService: Joebot.Configuration.ConfigurationService
 
-    private _cachedUsers: Map<string, Array<Joebot.CachedUser>> = new Map<string, Array<Joebot.CachedUser>>();
+    private _cachedUsers: Map<string, Array<Joebot.KickCache.CachedUser>> = new Map<string, Array<Joebot.KickCache.CachedUser>>();
     
     constructor (
         @inject(Symbols.Client) client: Client,
         @inject(Symbols.Helper) helper: Joebot.Helper,
         @inject(Symbols.Logger) logger: Logger,
-        @inject(Symbols.ConfigService) configService: Joebot.Configuration.ConfigurationService
     ) {
         this._helper = helper
         this._client = client;
         this._logger = logger;
-        this._configService = configService;
     }
 
-    public async FilterNonValidUsers(): Promise<void>{
-        this._logger.info("Checking for non-valid users to add to cache");
-
-        //Update these to user trigger service once implemented
-        let defaultChannel = ""
-        let guildId = ""
+    public async FilterNonValidUsers(config: Joebot.Configuration.AppConfig): Promise<void>{
+        this._logger.info("Checking for non-valid users to add to cache for config", config);
+        let guildId = config.GuildId;
+        let guild = this._client.guilds.cache.find(x => x.id == guildId);
+        let kickedUsersMessage = ""
 
         await this.updateCachedMembers(guildId);
-        let kickedUsersMessage = ""
-        
-        const dayThreshold = 2;
-        const hoursThreshold = 3;
-        let guild = this._client.guilds.cache.find(x => {return x.id== guildId})
-        if(guild){
-            for (let member of guild.members.cache.values()) {
-                let existingCachedMember = this.isCachedUser(guildId, member.user.id);
-                if(existingCachedMember){
-                    let user = this.getCachedUser(guildId, member.user.id);
-                    let cachedTime = new Date(user.cachedDate);
-                    let threasholdDate = new Date(member.joinedAt);
-                    cachedTime.setHours(cachedTime.getHours() + hoursThreshold)
-                    threasholdDate.setDate(threasholdDate.getDate() + dayThreshold)
 
-                    if(cachedTime < new Date() && threasholdDate < new Date()){
-                        let memberDm = await member.createDM();
-                        await memberDm.send("Hit the road JACK!");
-                        await member.kick(`No assigned role after ${dayThreshold} days`);
-                        this.updateGuildCachedArray(guildId, member.user.id, true);
-                        this._logger.info(`${member.user.username} was kicked for not having an assigned role`, member)
-                        kickedUsersMessage += `${kickedUsersMessage == "" ? "" : ", "}${member.user.username} 2yil`
-                    }
+        for (let member of guild.members.cache.values()) {
+            let existingCachedMember = this.isCachedUser(guildId, member.user.id);
+            if(existingCachedMember){
+                let user = this.getCachedUser(guildId, member.user.id);
+                //Get the date the user was added to the cache
+                let cachedTime = new Date(user.cachedDate);
+                //Get the date the user joined server at
+                let threasholdDate = new Date(member.joinedAt);
+
+                //Add the hours threshold to the cachedTime the user was cached at 
+                cachedTime.setHours(cachedTime.getHours() + config.KickerCacheConfig.KickCacheHours)
+
+                //Add the days threshold to the time the server joined the server at.
+                threasholdDate.setDate(threasholdDate.getDate() + config.KickerCacheConfig.KickCacheDays)
+
+                if(cachedTime < new Date() && threasholdDate < new Date()){
+                    let memberDm = await member.createDM();
+                    await memberDm.send(config.KickerCacheConfig.KickedUserMessage);
+                    await member.kick(`No assigned role after ${config.KickerCacheConfig.KickCacheDays} days`);
+                    this.removeItemFromCache(guildId, member.user.id);
+                    this._logger.info(`${member.user.username} was kicked for not having an assigned role`, member)
+                    kickedUsersMessage += `${kickedUsersMessage == "" ? "" : ", "}${member.user.username} ${config.KickerCacheConfig.KickServerMessage}`
                 }
             }
-            if(kickedUsersMessage != ""){
-                const channel = this._client.channels.cache.get(defaultChannel) as TextChannel 
-                if(channel){
-                    this._logger.info(`Sent message: '${kickedUsersMessage}' to channel:${channel.name}`,)
-                    channel.send(kickedUsersMessage)
-                } else {
-                    this._logger.info(`Could not find channel with id ${defaultChannel} to send message to`)
-                }
+        }
+        if(kickedUsersMessage != ""){
+            const channel = this._client.channels.cache.get(config.DefaultChannel) as TextChannel 
+            if(channel){
+                this._logger.info(`Sent message: '${kickedUsersMessage}' to channel:${channel.name}`,)
+                channel.send(kickedUsersMessage)
+            } else {
+                this._logger.info(`Could not find channel with id ${config.DefaultChannel} to send message to`)
             }
-    }
+        }
+    
     }
 
     private async updateCachedMembers(guildId:string): Promise<void> {
@@ -77,11 +74,12 @@ export class KickCacheService implements Joebot.KickCacheService {
             let userCached = this.isCachedUser(guildId, member.user.id);
             for(let role of memberRoles){
                 if(role.name == "@everyone" && memberRoles.length == 1 && !userCached){
-                    this.updateGuildCachedArray(guildId, member.user.id, false);
+                    this.addItemToCache(guildId, member.user.id);
+                    this.addItemToCache(guildId, member.user.id);
                     this._logger.info(`${member.user.username} does not have an assigned role, adding to cache`);
                 } else if(role.name != "@everyone" && userCached) {
                     this._logger.info(`${member.user.username} is assigned a role, removing user from cache`);
-                    this.updateGuildCachedArray(guildId, member.user.id, true);
+                    this.removeItemFromCache(guildId, member.user.id);
                 }
             }
         }
@@ -89,20 +87,17 @@ export class KickCacheService implements Joebot.KickCacheService {
 
     private isCachedUser(guildId:string, userId:string): boolean {
         let result = false;
-
         if(this._cachedUsers.has(guildId)){
             let cache = this._cachedUsers.get(guildId);
             if(cache.find(x => x.userId == userId) != undefined){
                 result = true;
             }
         }
-
         return result;  
     }
 
-    private getCachedUser(guildId: string, userId: string): Joebot.CachedUser {
+    private getCachedUser(guildId: string, userId: string): Joebot.KickCache.CachedUser {
         let result = null;
-
         if(this._cachedUsers.has(guildId)){
             let cache = this._cachedUsers.get(guildId);
             let user = cache.find(x => x.userId == userId);
@@ -110,35 +105,33 @@ export class KickCacheService implements Joebot.KickCacheService {
                 result = user
             }
         }
-
         return result;  
     }
 
+    private removeItemFromCache(guildId: string, userId: string): void{
+        if(this._cachedUsers.has(guildId)){
+            let cache = this._cachedUsers.get(guildId);
+            let cachedUserIndex = cache.findIndex(x => x.userId == userId);
+            if(cachedUserIndex >= 0){
+                cache.splice(cachedUserIndex);
+                this._cachedUsers.set(guildId, cache);
+            }
+        }
+    }
 
-    private updateGuildCachedArray(guildId:string, userId:string, remove:boolean){
-        let cache = new Array<Joebot.CachedUser>;
+    private addItemToCache(guildId:string, userId:string): void{
+        let cache = new Array<Joebot.KickCache.CachedUser>();
+        let userIsCached = false;
         if(this._cachedUsers.has(guildId)){
             cache = this._cachedUsers.get(guildId);
-            if(remove){
-                let i = cache.findIndex( (x) => x.userId == userId);
-                if ( i > 0){
-                    cache.slice(i, 1);
-                    this._logger.log("Removing user from the cache", userId);
-                }
-            }
+            userIsCached = cache.find(x => x.userId == userId) != undefined;
         }
-        if(!remove){
-            let existingCache = cache.find(x => x.userId == userId);
-            if(existingCache != undefined){
-                cache.push({
-                    userId: userId,
-                    cachedDate: new Date() 
-                });
-                this._cachedUsers.set(guildId, cache)
-                this._logger.log("Adding user to the cache", userId);
-            } else {
-                this._logger.log("User already exists in cache", userId)
-            }
+        if(!userIsCached){
+            cache.push({
+                userId: userId,
+                cachedDate: new Date()
+            });
         }
+        this._cachedUsers.set(guildId, cache);
     }
 }
