@@ -53,8 +53,7 @@ export class Bot implements Joebot.Bot{
             }
         }, undefined, true, "America/Winnipeg", undefined, true);
 
-        // new CronJob('0 0 */1 * * *', async () => {
-        new CronJob('0 * * * * *', async () => {
+        new CronJob('0 0 */1 * * *', async () => {
             try{
                 let configs = this._configService.GetAllConfigurations();
                 for(let configItem of configs){
@@ -96,22 +95,25 @@ export class Bot implements Joebot.Bot{
         let formattedMessage:string = message.content.substring(1);
         let command = formattedMessage.split(" ")[0].toLowerCase();
         let messageArgs = formattedMessage.substring(command.length + 1)
-        let configuration: Joebot.Configuration.AppConfig | undefined;
-        let secretUsers = new Array<string>();
+        let isSecret = false
+        let defaultChannel = ""
 
-        if(message.guild){
-            configuration = this._configService.GetConfigurationForGuild(message.guild.id);
+        for(let config of this._configService.GetAllConfigurations()){
+            if(config?.SecretUsers != undefined){
+                isSecret = config.SecretUsers.find(x => x == message.author.id) != undefined;
+                defaultChannel = config.DefaultChannel
+                if(isSecret){
+                    break;
+                }
+            }
+
         }
 
-        if(configuration?.SecretUsers){
-            secretUsers = configuration.SecretUsers
-        }
-
-        if(secretUsers.includes(message.author.id) && message.guild == null && command == "send"){
+        if(isSecret && message.guild == null && command == "send"){
             let cmdArgs = messageArgs.split(";;");
             if(cmdArgs.length > 0){
                 let messageToSend= cmdArgs.length == 1 ? cmdArgs[0] : cmdArgs[1];
-                let channelToSend = cmdArgs.length == 2 ? cmdArgs[0].trim() : undefined;
+                let channelToSend = cmdArgs.length == 2 ? cmdArgs[0].trim() : defaultChannel;
                 let result = await this._helper.SendMessageToChannel(messageToSend, channelToSend);
                 if(result){
                     returnMessage.push(result);

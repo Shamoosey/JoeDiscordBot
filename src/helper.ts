@@ -10,9 +10,6 @@ export class Helper implements Joebot.Helper {
     private _client: Client;
     private _logger: Logger;
 
-    private kickerCacheEnabled = true;
-    private readonly guild = "306275893167521792"
-    private readonly defaultChannel = "306275893167521792";
     private readonly urlRegex = "(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})";
     
     constructor(
@@ -72,7 +69,7 @@ export class Helper implements Joebot.Helper {
         return match;
     }
 
-    public async SendMessageToChannel(message:string, channelId:string = this.defaultChannel): Promise<string|undefined>{
+    public async SendMessageToChannel(message:string, channelId:string): Promise<string|undefined>{
         let returnMessage;
         try{
             const channel = this._client.channels.cache.get(channelId) as TextChannel 
