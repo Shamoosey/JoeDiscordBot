@@ -67,7 +67,7 @@ export class ConfigurationService implements Joebot.Configuration.ConfigurationS
                     MessageDelete: item.data().MessageDelete,
                     ReactEmote: item.data().ReactEmote,
                     Responses: item.data().Responses,
-                    SendRandomResponse: item.data().SendRandonResponse
+                    SendRandomResponse: item.data().SendRandomResponse
                 })
             })
 
