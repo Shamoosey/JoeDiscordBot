@@ -34,4 +34,5 @@ container.bind<Joebot.Helper>(Symbols.Helper).to(Helper).inSingletonScope();
 container.bind<Logger>(Symbols.Logger).toConstantValue(LogFactory.GetNewLogger());
 container.bind<Joebot.Configuration.ConfigurationService>(Symbols.ConfigService).to(ConfigurationService).inSingletonScope();
 container.bind<Joebot.KickCache.KickCacheService>(Symbols.KickCacheService).to(KickCacheService).inSingletonScope();
+
 export default container;

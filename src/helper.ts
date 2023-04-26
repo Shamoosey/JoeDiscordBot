@@ -39,7 +39,7 @@ export class Helper implements Joebot.Helper {
         let commands: string[] = Object.values(Commands);
         
         commands.forEach(item => {
-            returnMessage += `\n${process.env.PREFIX}${item}`
+            returnMessage += `\n${process.env.BOT_PREFIX}${item}`
         });
         
         return returnMessage;
