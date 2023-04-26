@@ -73,7 +73,7 @@ export class Bot implements Joebot.Bot{
             if(message.mentions.has(this._client.user.id)){
                 returnMessage = this._configService.DefaultResponses;
             } else {
-                if(message.content.startsWith(process.env.BOT_BOT_PREFIX)){
+                if(message.content.startsWith(process.env.BOT_PREFIX)){
                     this._logger.info(`Incomming command "${message.content}" from ${message.author.username}`)
                     returnMessage = await this.checkCommands(message);
                 } else {
