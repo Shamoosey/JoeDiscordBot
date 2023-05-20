@@ -49,7 +49,6 @@ export namespace Joebot{
         export interface ConfigurationService {
             DefaultResponses:Array<string>;
             StatusMessages: Array<StatusMessage>;
-            TestMode: boolean;
             InitializeAppConfigurations(guilds:Array<string>): Promise<void>;
             GetAllConfigurations():Array<Joebot.Configuration.AppConfig>
             GetConfigurationForGuild(guildId: string): Joebot.Configuration.AppConfig | undefined;

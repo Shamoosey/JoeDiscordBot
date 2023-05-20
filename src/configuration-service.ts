@@ -20,8 +20,6 @@ export class ConfigurationService implements Joebot.Configuration.ConfigurationS
     ]
     public StatusMessages = new Array<Joebot.StatusMessage>(); 
 
-    public TestMode = false;
-
     constructor (
         @inject(Symbols.Client) client: Client,
         @inject(Symbols.Helper) helper: Joebot.Helper,
@@ -43,9 +41,6 @@ export class ConfigurationService implements Joebot.Configuration.ConfigurationS
     public async InitializeAppConfigurations(guilds:Array<string>): Promise<void> {
         this._configurations = new Array<Joebot.Configuration.AppConfig>();
         
-        if(process.env.NODE_ENV == "dev" && this._client.user.id == process.env.TESTING_USER) {
-            this.TestMode = true;
-        }
         const statusMessages = await this._db.collection(`/StatusMessages`).get()
 
         statusMessages.forEach(async (item) => {
