@@ -1,0 +1,7 @@
+services:
+  joe-bot:
+    build:
+      context: .
+      args:
+        - TOKEN=${JOE_TOKEN}
+      dockerfile: ./Dockerfile
