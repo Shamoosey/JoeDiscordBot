@@ -30,10 +30,7 @@ export abstract class LogFactory {
             ],
             format: LogFactory.getLogformat()
         })
-        
-        if(process.env.NODE_ENV == "dev"){
-            logger.add(new transports.Console())
-        }
+        logger.add(new transports.Console())
 
         return logger;
     }
