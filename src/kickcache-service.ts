@@ -24,7 +24,7 @@ export class KickCacheService implements Joebot.KickCache.KickCacheService {
 
     public async FilterNonValidUsers(config: Joebot.Configuration.AppConfig): Promise<void>{
         this._logger.info("Checking for non-valid users to add to cache for config", config);
-        let guildId = config.GuildId;
+        let guildId = config.serverId;
         let guild = this._client.guilds.cache.find(x => x.id == guildId);
         let kickedUsersMessage = ""
 
@@ -40,28 +40,28 @@ export class KickCacheService implements Joebot.KickCache.KickCacheService {
                 let threasholdDate = new Date(member.joinedAt);
 
                 //Add the hours threshold to the cachedTime the user was cached at 
-                cachedTime.setHours(cachedTime.getHours() + config.KickerCacheConfig.KickCacheHours)
+                cachedTime.setHours(cachedTime.getHours() + config.kickCacheHours)
 
                 //Add the days threshold to the time the server joined the server at.
-                threasholdDate.setDate(threasholdDate.getDate() + config.KickerCacheConfig.KickCacheDays)
+                threasholdDate.setDate(threasholdDate.getDate() + config.kickCacheDays)
 
                 if(cachedTime < new Date() && threasholdDate < new Date()){
                     let memberDm = await member.createDM();
-                    await memberDm.send(config.KickerCacheConfig.KickedUserMessage);
-                    await member.kick(`No assigned role after ${config.KickerCacheConfig.KickCacheDays} days`);
+                    await memberDm.send(config.kickCacheUserMessage);
+                    await member.kick(`No assigned role after ${config.kickCacheDays} days`);
                     this.removeItemFromCache(guildId, member.user.id);
                     this._logger.info(`${member.user.username} was kicked for not having an assigned role`, member)
-                    kickedUsersMessage += `${kickedUsersMessage == "" ? "" : ", "}${member.user.username} ${config.KickerCacheConfig.KickServerMessage}`
+                    kickedUsersMessage += `${kickedUsersMessage == "" ? "" : ", "}${member.user.username} ${config.kickCacheServerMessage}`
                 }
             }
         }
         if(kickedUsersMessage != ""){
-            const channel = this._client.channels.cache.get(config.DefaultChannel) as TextChannel 
+            const channel = this._client.channels.cache.get(config.defaultChannel) as TextChannel 
             if(channel){
                 this._logger.info(`Sent message: '${kickedUsersMessage}' to channel:${channel.name}`,)
                 channel.send(kickedUsersMessage)
             } else {
-                this._logger.info(`Could not find channel with id ${config.DefaultChannel} to send message to`)
+                this._logger.info(`Could not find channel with id ${config.defaultChannel} to send message to`)
             }
         }
     

@@ -40,8 +40,7 @@ export class Bot implements Joebot.Bot{
     }
 
     private async Initalize():Promise<void> {
-        let guilds = this._client.guilds.cache.map(x => x.id);
-        await this._configService.InitializeAppConfigurations(guilds);
+        await this._configService.InitializeAppConfigurations();
 
         this._client.on('messageCreate', async (message: Message) => await this.onMessage(message));
 
@@ -57,7 +56,7 @@ export class Bot implements Joebot.Bot{
             try{
                 let configs = this._configService.GetAllConfigurations();
                 for(let configItem of configs){
-                    if(configItem.KickerCacheConfig.EnableKickerCache){
+                    if(configItem.enableKickCache){
                         await this._kickCacheService.FilterNonValidUsers(configItem);
                     }
                 }
@@ -99,9 +98,9 @@ export class Bot implements Joebot.Bot{
         let defaultChannel = ""
 
         for(let config of this._configService.GetAllConfigurations()){
-            if(config?.SecretUsers != undefined){
-                isSecret = config.SecretUsers.find(x => x == message.author.id) != undefined;
-                defaultChannel = config.DefaultChannel
+            if(config?.users != undefined){
+                isSecret = config.users.find(x => x.discordUserId == message.author.id)?.isSecret != undefined;
+                defaultChannel = config.defaultChannel
                 if(isSecret){
                     break;
                 }
@@ -122,7 +121,7 @@ export class Bot implements Joebot.Bot{
         } else {
             switch(command){
                 case Commands.Status:
-                    returnMessage.push(await this._helper.SetStatus({Status: messageArgs}));
+                    returnMessage.push(await this._helper.SetStatus({status: messageArgs}));
                     break;
                 case Commands.Help:
                     returnMessage.push(this._helper.GetHelpMessage())

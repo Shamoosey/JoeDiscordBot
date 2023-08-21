@@ -26,48 +26,54 @@ export namespace Joebot{
             userId: string;
             cachedDate: Date;
         }
-        
-        export interface KickCacheConfig{
-            EnableKickerCache: boolean;
-            KickCacheDays: number;
-            KickCacheHours: number;
-            KickServerMessage: string;
-            KickedUserMessage: string;
-        }
     }
 
     export namespace Configuration {
-
-        export interface AppConfig {
-            GuildId: string;
-            Triggers: Array<Trigger>;
-            SecretUsers: Array<string>;
-            KickerCacheConfig: KickCache.KickCacheConfig;
-            DefaultChannel: string;
-        }
         
         export interface ConfigurationService {
             DefaultResponses:Array<string>;
             StatusMessages: Array<StatusMessage>;
-            InitializeAppConfigurations(guilds:Array<string>): Promise<void>;
+            InitializeAppConfigurations(): Promise<void>;
             GetAllConfigurations():Array<Joebot.Configuration.AppConfig>
             GetConfigurationForGuild(guildId: string): Joebot.Configuration.AppConfig | undefined;
             CheckTriggers(message:Message): Promise<Array<string>>;
         }
+        
 
+        export interface AppConfig {
+            serverId: string;
+            name: string;
+            defaultChannel: string;
+            enableKickCache: boolean;
+            kickCacheDays: number;
+            kickCacheHours: number;
+            kickCacheServerMessage: string;
+            kickCacheUserMessage: string;
+            triggers: Array<Trigger>;
+            users: Array<User>;
+        }
+
+        export interface User {
+            id: string;
+            isSecret: boolean;
+            userName: string;
+            discordUserId: string;
+        }
         export interface Trigger {
-            TriggerWords:Array<string>;
-            Responses?: Array<string>;
-            MessageDelete?: boolean;
-            SendRandomResponse?: boolean;
-            IgnoreCooldown?: boolean;
-            ReactEmote?: Array<string>;
+            id: string;
+            name: string;
+            messageDelete?: boolean;
+            sendRandomResponse?: boolean;
+            ignoreCooldown?: boolean;
+            triggerWords:Array<string>;
+            triggerResponses?: Array<string>;
+            reactEmotes?: Array<string>;
         }
     }
 
     export interface StatusMessage {
-        Status: string;
-        Type?: ActivityType;
+        status: string;
+        type?: ActivityType;
     }
 
 } 

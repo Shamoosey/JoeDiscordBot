@@ -25,10 +25,10 @@ export class Helper implements Joebot.Helper {
         let returnMsg = "CAN'T CHANGE MY STATUS IF YOU DONT TELL ME WHAT YOU WANT JACK!";
 
         if(message){
-            if(!message.Type || message.Type == undefined){
-                message.Type = ActivityType.Playing
+            if(!message.type || message.type == undefined){
+                message.type = ActivityType.Playing
             }
-            await this._client.user.setActivity(message.Status, { type: message.Type as any, })
+            await this._client.user.setActivity(message.status, { type: message.type as any, })
             returnMsg = `Status changed to: ${message}`;
         }
         return returnMsg
